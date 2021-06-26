@@ -1,8 +1,9 @@
 import sys
 sys.path.append( "/home/yons/Desktop/developer-luo/SWatNet")
-from utils.tiff_io import readTiff
+from utils.geotif_io import readTiff
 import torch
 import numpy as np
+from utils.preprocess import crop_scales
 
 class scene_path_dset(torch.utils.data.Dataset):
     '''sentinel-1 ascending/descending image and the truth reading
@@ -16,23 +17,24 @@ class scene_path_dset(torch.utils.data.Dataset):
         self.transforms = transforms
     def __getitem__(self, index):
         '''load images and truths'''
-        ascend_src, ascend = readTiff(self.paths_ascend[index])
-        descend_src, descend = readTiff(self.paths_descend[index])
-        truth_src, truth = readTiff(self.paths_truth[index])
+        ascend, ascend_info = readTiff(self.paths_ascend[index])
+        descend, descend_info = readTiff(self.paths_descend[index])
+        truth, truth_info = readTiff(self.paths_truth[index])
         scene = np.concatenate((ascend, descend), axis=-1)
         '''pre-processing (e.g., random crop)'''
+        patch_group, truth = crop_scales(scales=[2048,512,256], threads=False)(scene, truth)
         for transform in self.transforms:
-            scene, truth = transform(scene, truth)
-        return scene, torch.unsqueeze(truth,0)
+            patch_group, truth = transform(patch_group, truth)
+        return patch_group, torch.unsqueeze(truth,0)
     def __len__(self):
         return len(self.paths_truth)
+
 
 class scene_tensor_dset(torch.utils.data.Dataset):
     '''sentinel-1 scene and the corresponding truth reading
         from the torch.Tensor: read data from memory.
-        time record: data (15 s1_image) read->0.7s model train -> 0.07 s 
     '''
-    def __init__(self, scene_tensor_list, truth_tensor_list, transforms):
+    def __init__(self, scene_tensor_list, truth_tensor_list, transforms, scales=[2048,512,256]):
         '''input arrs_scene, arrs_truth are list'''
         self.scene_tensor_list = scene_tensor_list
         self.truth_tensor_list = truth_tensor_list
@@ -42,11 +44,13 @@ class scene_tensor_dset(torch.utils.data.Dataset):
         scene = self.scene_tensor_list[index]
         truth = self.truth_tensor_list[index]
         '''pre-processing (e.g., random crop)'''
+        patch_group, truth = crop_scales(scales=[2048,512,256], threads=False)(scene, truth)
         for transform in self.transforms:
-            scene, truth = transform(scene, truth)
-        return scene, torch.unsqueeze(truth,0)
+            patch_group, truth = transform(patch_group, truth)
+        return patch_group, torch.unsqueeze(truth,0)
     def __len__(self):
         return len(self.truth_tensor_list)
+
 
 class patch_path_dset(torch.utils.data.Dataset):
     '''sentinel-1 patch and the truth reading from data paths (in SSD)
