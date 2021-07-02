@@ -1,5 +1,3 @@
-import sys
-# sys.path.append( "/home/yons/Desktop/developer-luo/SWatNet/model")
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -33,6 +31,26 @@ def deconv4x4_bn_relu(in_channels=256, out_channels=256):
         nn.BatchNorm2d(out_channels),
         nn.ReLU(inplace=True)
     )
+
+def convert_g_l(img_g, scale_ratio):
+    '''global_size should be divisible by local_size.
+    '''
+    size_g = img_g.shape[2]
+    size_l = size_g//scale_ratio
+    if size_l >= 1:
+        ''' crop -> enlarge scale '''
+        start_crop = (size_g - size_l)//2
+        img_l_crop = img_g[:,:, start_crop:start_crop+size_l, start_crop:start_crop+size_l]
+        img_l = F.interpolate(img_l_crop, size=[size_g, size_g], mode='nearest')
+
+    else:
+        ''' enlarge scale -> crop '''
+        start_crop = (size_g*scale_ratio - size_l*scale_ratio)//2
+        img_g_up = F.interpolate(img_g, size=[size_g*scale_ratio, size_g*scale_ratio], mode='nearest')
+        img_l = img_g_up[:, :, start_crop:start_crop+size_l*scale_ratio, start_crop:start_crop+size_l*scale_ratio]
+
+    return img_l
+
 
 ####-----------for the unet-----------####
 class dsample(nn.Module):

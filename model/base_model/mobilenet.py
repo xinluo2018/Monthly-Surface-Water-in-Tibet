@@ -110,5 +110,3 @@ class MobileNetV2(nn.Module):
         x = self.classifier(x)
         return x
 
-# model = MobileNetV2(num_bands=4, num_classes=2)
-# summary(model, input_size=(4,256,256))

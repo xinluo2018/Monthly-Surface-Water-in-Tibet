@@ -13,7 +13,7 @@ class numpy2tensor:
         ptruth_tensor = torch.from_numpy(ptruth.copy())
         return patch_group_tensor, ptruth_tensor
 
-#### --------- numpy-based -----------
+#### ----------- numpy-based --------------
 #### --------------------------------------
 
 class rotate:
@@ -93,8 +93,8 @@ class noise:
             return patches_noisy, truth
 
 
-#### ------------ torch-based --------------
-#### ---------------------------------------
+#### -------------- torch-based ----------------
+#### -------------------------------------------
 class torch_rotate:
     '''torch-based
        des: randomly rotation with given probability

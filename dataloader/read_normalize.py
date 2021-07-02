@@ -2,7 +2,7 @@ from utils.preprocess import normalize
 from utils.geotif_io import readTiff
 import numpy as np
 
-s1_min = [-57.78, -70.37, -58.98, -68.47]
+s1_min = [-57.78, -70.37, -58.98, -68.47]  # as-vv, as-vh, des-vv, des-vh
 s1_max = [25.98, 10.23, 29.28, 17.60]
 
 def read_normalize(paths_as, paths_des, paths_truth):
@@ -18,11 +18,9 @@ def read_normalize(paths_as, paths_des, paths_truth):
         ascend, ascend_info = readTiff(paths_as[i])
         descend, descend_info = readTiff(paths_des[i])
         truth, truth_info = readTiff(paths_truth[i])
-        ## --- data preprocessing: 
-        ## ---- 1) np.array -> torch.Tensor; 2) data normalization
+        ## --- data normalization 
         scene = np.concatenate((ascend, descend), axis=-1)    
         scene, truth = normalize(max=s1_max, min=s1_min)(scene, truth)
-        # scene, truth = toTensor()(scene, truth)
         scene = scene.transpose(2,0,1)   # channel first
         scene_list.append(scene), truth_list.append(truth)
     return scene_list, truth_list

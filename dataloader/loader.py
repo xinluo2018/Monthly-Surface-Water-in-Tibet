@@ -1,5 +1,4 @@
-import sys
-sys.path.append( "/home/yons/Desktop/developer-luo/SWatNet")
+
 from utils.geotif_io import readTiff
 import torch
 import numpy as np

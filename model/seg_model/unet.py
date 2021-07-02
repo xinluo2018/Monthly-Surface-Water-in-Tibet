@@ -1,11 +1,8 @@
-import os
-import sys
-sys.path.append(os.path.dirname(__file__))
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchsummary import summary
-from helper import dsample, upsample
+from model.seg_model.helper import dsample, upsample
 
 class unet(nn.Module):
     ''' 
@@ -56,10 +53,4 @@ class unet(nn.Module):
         out_prob = self.outp_layer(output)
         return out_prob
 
-if __name__ =='__main__':
-    model = unet(num_bands=4, num_classes=2)
-    model.eval()
-    input = torch.randn(4, 4, 256, 256)
-    outp = model(input)
-    print(outp.shape)
 

@@ -1,16 +1,15 @@
 import os
-import sys
-sys.path.append(os.path.dirname(__file__))
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from encoder import Xception65_feat
-from encoder import Mobilev2_feat
-from helper import conv1x1_bn_relu,conv3x3_bn_relu,deconv4x4_bn_relu
-from helper import aspp
-from torchsummary import summary
+from .helper import aspp
+from .encoder import Xception65_feat
+from .encoder import Mobilev2_feat
+from .helper import conv1x1_bn_relu, conv3x3_bn_relu,deconv4x4_bn_relu
+
 
 class deeplabv3plus(nn.Module):
+    '''des: original deeplabv3_plus model'''
     def __init__(self, num_bands=4, num_classes=2, backbone=Xception65_feat):
         super(deeplabv3plus, self).__init__()        
         self.backbone = backbone(num_bands=num_bands)
@@ -38,8 +37,10 @@ class deeplabv3plus(nn.Module):
         x_fea_high = self.aspp(fea_high)    # channels: -> 256
         x_fea_high = F.interpolate(x_fea_high, fea_low.size()[-2:], \
                                     mode='bilinear', align_corners=True)
+
         ## -------low-level features------- ##
         x_fea_low = self.low_block(fea_low)   # channels: ->48
+
         ## -------features concat-------  ##
         x_fea_concat = torch.cat([x_fea_high, x_fea_low], dim=1) # 
         x_fea_concat = self.high_low_block(x_fea_concat)
@@ -49,19 +50,21 @@ class deeplabv3plus(nn.Module):
         return x_out_prob
 
 class deeplabv3plus_imp(nn.Module): 
-    def __init__(self, num_bands, num_classes, channels_fea=[16,24,64]):
-        ''' channels_fea (list) -> [chan_low,chan_mid,chan_high] '''
+    def __init__(self, num_bands, num_classes, channels_fea=[16, 24, 64]):
+        ''' 
+        Improvement: 1. use mobilenetv2; 2. use a mid-level feature.
+        channels_fea (list) -> [chan_low,chan_mid,chan_high] '''
         super(deeplabv3plus_imp, self).__init__()
         self.aspp_channels = 256
         self.backbone = Mobilev2_feat(num_bands=num_bands)
         self.aspp = aspp(in_channels=channels_fea[2], atrous_rates=[12, 24, 36])
-        self.mid_process = conv1x1_bn_relu(channels_fea[1], 128)
-        self.high_mid_process = nn.Sequential(
+        self.mid_layer = conv1x1_bn_relu(channels_fea[1], 128)
+        self.high_mid_layer = nn.Sequential(
                         conv1x1_bn_relu(128+self.aspp_channels, 128),
                         conv3x3_bn_relu(128, 128)
                         )
-        self.low_process = conv1x1_bn_relu(channels_fea[0], 128)
-        self.high_mid_low_process = nn.Sequential(
+        self.low_layer = conv1x1_bn_relu(channels_fea[0], 128)
+        self.high_mid_low_layer = nn.Sequential(
                         deconv4x4_bn_relu(128+128, 256),
                         nn.Dropout(0.5),
                         conv1x1_bn_relu(256, 128),
@@ -86,25 +89,15 @@ class deeplabv3plus_imp(nn.Module):
         x_fea_high = F.interpolate(x_fea_high, \
                         fea_mid.size()[-2:], mode='bilinear', align_corners=True)
         ### ------mid-level feature, and concat
-        x_fea_mid = self.mid_process(fea_mid)
+        x_fea_mid = self.mid_layer(fea_mid)
         x_fea_high_mid = torch.cat([x_fea_high, x_fea_mid], dim=1)
-        x_fea_high_mid = self.high_mid_process(x_fea_high_mid)
+        x_fea_high_mid = self.high_mid_layer(x_fea_high_mid)
         x_fea_high_mid = F.interpolate(x_fea_high_mid, \
                         fea_low.size()[-2:], mode='bilinear', align_corners=True)
         ### ------low-level feature, and concat
-        x_fea_low = self.low_process(fea_low)
+        x_fea_low = self.low_layer(fea_low)
         x_fea_high_mid_low = torch.cat([x_fea_high_mid, x_fea_low], dim=1)
-        x_fea_high_mid_low = self.high_mid_low_process(x_fea_high_mid_low)
+        x_fea_high_mid_low = self.high_mid_low_layer(x_fea_high_mid_low)
         out_prob = self.outp_layer(x_fea_high_mid_low)
         return out_prob
-
-if __name__ =='__main__':
-    model = deeplabv3plus(num_bands=4, num_classes=2)
-    model = deeplabv3plus_imp(num_bands=4, \
-                        num_classes=2, channels_fea=[16,24,64])
-    # summary(model,(4, 256, 256))
-    model.eval()
-    input = torch.randn(4, 4, 256, 256)
-    outp = model(input)
-    print(outp.shape)
 

@@ -178,5 +178,3 @@ class Xception65(nn.Module):
         x = self.fc(x)
         return x
 
-# model = Xception65(num_bands=4, num_classes=2)
-# summary(model, input_size=(4,256,256))

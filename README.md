@@ -1,2 +1,3 @@
 # SWatNet
-A deep learning model for surface water mapping based on SAR image
+A deep learning model for SAR image-based surface water mapping.
+

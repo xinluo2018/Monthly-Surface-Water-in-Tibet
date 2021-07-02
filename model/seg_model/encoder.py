@@ -1,10 +1,14 @@
+
 import torch.nn as nn
-import sys
-sys.path.append('/home/yons/Desktop/developer-luo/SWatNet/model')
-from base_model.xception65 import Xception65
-from base_model.mobilenet import MobileNetV2
+from model.base_model.xception65 import Xception65
+from model.base_model.mobilenet import MobileNetV2
 
 class Xception65_feat(nn.Module):
+    '''original encoder for deeplabv3_plus moel
+      retrun:
+        high-level + low-level features
+
+    '''
     def __init__(self, num_bands=4):
         super(Xception65_feat, self).__init__()
         self.backbone = Xception65(num_bands)
@@ -40,8 +44,11 @@ class Xception65_feat(nn.Module):
         fea_high = x      # size -> 1/32, num_channels -> 2048
         return fea_low, fea_high
 
+
+
 class Mobilev2_feat(nn.Module):
-    '''output: low + midlle + high features'''
+    '''return:
+        low-level + middle-level + high-level features'''
     def __init__(self, num_bands=4):
         super(Mobilev2_feat, self).__init__()
         self.backbone = MobileNetV2(num_bands=num_bands)

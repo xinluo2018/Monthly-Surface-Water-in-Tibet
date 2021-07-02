@@ -1,18 +1,9 @@
 '''simple pre-processing'''
-import torch
 import numpy as np
 import random
 import cv2
 import threading as td
 from queue import Queue
-
-# class toTensor:
-#     """Convert ndarrays to torch.Tensors (channel, height, width)."""
-#     def __call__(self, image, truth):
-#         image = image.astype(np.float32).transpose((2, 0, 1)) #（channels, height, width）
-#         image = torch.from_numpy(image).float()
-#         truth = torch.from_numpy(truth).long()
-#         return image, truth
 
 class normalize:
     '''normalization with the given per-band max and min values'''
@@ -22,6 +13,7 @@ class normalize:
     def __call__(self, image, truth):
         for band in range(image.shape[-1]):
             image[:,:,band] = (image[:,:,band]-self.min[band])/(self.max[band]-self.min[band]+0.0001)
+        image = np.clip(image, 0., 1.) 
         return image, truth
 
 
@@ -42,7 +34,7 @@ class crop_scales:
         input scales: tuple or list (high -> low)
         we design a multi-thread processsing
     '''
-    def __init__(self, scales=(2048, 512, 256), threads=True):
+    def __init__(self, scales=(2048, 512, 256), threads=False):
         self.scales = scales
         self.threads = threads
 
