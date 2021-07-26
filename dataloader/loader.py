@@ -28,7 +28,6 @@ class scene_path_dset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.paths_truth)
 
-
 class scene_tensor_dset(torch.utils.data.Dataset):
     '''sentinel-1 scene and the corresponding truth reading
         from the torch.Tensor: read data from memory.

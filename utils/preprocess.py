@@ -24,9 +24,9 @@ def crop(image, truth, size=(256, 256)):
         input size: (height, width)'''
     start_h = random.randint(0, truth.shape[0]-size[0])
     start_w = random.randint(0, truth.shape[1]-size[1])
-    image_crop = image[:,start_h:start_h+size[0], start_w:start_w+size[1]]
-    truth_crop = truth[start_h:start_h+size[0], start_w:start_w+size[1]]
-    return image_crop, truth_crop
+    patch = image[:,start_h:start_h+size[0], start_w:start_w+size[1]]
+    ptruth = truth[start_h:start_h+size[0], start_w:start_w+size[1]]
+    return patch, ptruth
 
 class crop_scales:
     ''' numpy-based

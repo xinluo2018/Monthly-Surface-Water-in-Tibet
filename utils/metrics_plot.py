@@ -26,7 +26,7 @@ def metrics_plot(metrics, keys, colors, axis_name=['Iterations', 'Accuracy'], \
                                                         for i in range(5)]
     plt.figure(figsize=(6, 4))
     ax = plt.subplot(111)
-    ## insert epoch column
+    ## insert epoches column
     if 'epoch' not in metrics.columns:
         metrics.insert(0, 'epoch', np.arange(metrics.shape[0]))
     for i, key in enumerate(keys):

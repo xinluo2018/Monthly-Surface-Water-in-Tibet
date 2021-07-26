@@ -1,8 +1,11 @@
 import torch
+import random
 import torch.nn as nn
 import torch.nn.functional as F
 from torchsummary import summary
 from model.seg_model.helper import dsample, upsample
+from .helper import convert_g_l
+
 
 class unet(nn.Module):
     ''' 
@@ -54,3 +57,38 @@ class unet(nn.Module):
         return out_prob
 
 
+class unet_2(nn.Module):
+    ''' 
+    des: 
+        unet model for single-scale image processing,
+        the input scale is randomly selected from the three input scale.
+        the truth is constantly corresponding to the low-scale
+    '''
+    def __init__(self, num_bands, num_classes, scale_high=2048, scale_mid=512, scale_low=256):
+        super(unet_2, self).__init__()
+        self.num_classes = num_classes
+        self.scale_high, self.scale_mid, self.scale_low = scale_high, scale_mid, scale_low
+        self.high2low_ratio = scale_high//scale_low
+        self.mid2low_ratio = scale_mid//scale_low
+        self.encoder = nn.ModuleList([
+            dsample(in_channels=num_bands, ex_channels=32, out_channels=16, scale=2), # 1/2
+            dsample(in_channels=16, ex_channels=64, out_channels=16, scale=2),   # 1/4
+            dsample(in_channels=16, ex_channels=128, out_channels=32, scale=2),  # 1/8
+            dsample(in_channels=32, ex_channels=128, out_channels=32, scale=4),  # 1/32
+            dsample(in_channels=32, ex_channels=256, out_channels=64, scale=4),  # 1/128
+        ])
+        self.decoder = nn.ModuleList([
+            upsample(in_channels=64, out_channels=64, scale=4),    # 1/32
+            upsample(in_channels=64+32, out_channels=64, scale=4), # 1/8
+            upsample(in_channels=64+32, out_channels=64, scale=2), # 1/4
+            upsample(in_channels=64+16, out_channels=32, scale=2), # 1/2
+        ])
+        self.up_last = upsample(in_channels=32+16, out_channels=32, scale=2)
+        if num_classes == 2:
+            self.outp_layer = nn.Sequential(
+                        nn.Conv2d(in_channels=32, out_channels=1, kernel_size=1),
+                        nn.Sigmoid())
+        else:
+            self.outp_layer = nn.Sequential(
+                        nn.Conv2d(in_channels=32, out_channels=num_classes, kernel_size=1),
+                        nn.Softmax(dim=1))

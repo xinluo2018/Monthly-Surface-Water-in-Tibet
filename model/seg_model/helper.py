@@ -36,18 +36,19 @@ def convert_g_l(img_g, scale_ratio):
     '''global_size should be divisible by local_size.
     '''
     size_g = img_g.shape[2]
-    size_l = size_g//scale_ratio
+    size_l = size_g/scale_ratio
     if size_l >= 1:
         ''' crop -> enlarge scale '''
-        start_crop = (size_g - size_l)//2
-        img_l_crop = img_g[:,:, start_crop:start_crop+size_l, start_crop:start_crop+size_l]
+        start_crop = int((size_g - size_l)//2)
+        img_l_crop = img_g[:,:, start_crop:int(start_crop+size_l), start_crop:int(start_crop+size_l)]
         img_l = F.interpolate(img_l_crop, size=[size_g, size_g], mode='nearest')
 
     else:
         ''' enlarge scale -> crop '''
-        start_crop = (size_g*scale_ratio - size_l*scale_ratio)//2
+        start_crop = int((size_g*scale_ratio - size_l*scale_ratio)//2)
         img_g_up = F.interpolate(img_g, size=[size_g*scale_ratio, size_g*scale_ratio], mode='nearest')
-        img_l = img_g_up[:, :, start_crop:start_crop+size_l*scale_ratio, start_crop:start_crop+size_l*scale_ratio]
+        img_l = img_g_up[:, :, start_crop:start_crop+int(size_l*scale_ratio), \
+                                    start_crop:start_crop+int(size_l*scale_ratio)]
 
     return img_l
 

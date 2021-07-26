@@ -2,9 +2,11 @@
 import torch
 import threading as td
 from queue import Queue
-from utils.preprocess import crop_scales
+from utils.preprocess import crop_scales,crop
+import random
+import numpy as np
+import cv2
 import gc
-
 
 def scenes2patches(scene_list, truth_list, transforms, scales=[2048, 512, 256]):    
     patch_list, ptruth_list = [],[]
@@ -18,9 +20,11 @@ def scenes2patches(scene_list, truth_list, transforms, scales=[2048, 512, 256]):
         patch_list.append(patches_group), ptruth_list.append(truth)
     return patch_list, ptruth_list
 
+
 def job_scenes2patches(q, scene_list, truth_list, transforms):
     patch_list, ptruth_list = scenes2patches(scene_list, truth_list, transforms, scales=[2048, 512, 256])
     q.put((patch_list, ptruth_list))
+
 
 def threads_read(scene_list, truth_list, transforms, num_thread=20):
     '''multi-thread reading training data
@@ -37,6 +41,7 @@ def threads_read(scene_list, truth_list, transforms, num_thread=20):
         patch_lists += patch_list
         ptruth_lists += ptruth_list
     return patch_lists, ptruth_lists
+
 
 class threads_scene_dset(torch.utils.data.Dataset):
     ''' des: dataset (patch and the truth) parallel reading from RAM memory
@@ -65,3 +70,5 @@ class threads_scene_dset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.patches_list)
+
+
