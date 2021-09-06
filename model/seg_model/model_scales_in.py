@@ -45,6 +45,7 @@ class unet_scales(nn.Module):
 
     def forward(self, input):
         x_encode_high, x_encode_mid, x_encode_low = input[0], input[1], input[2]
+
         '''--------feature encoding---------'''
         skips_high, skips_mid, skips_low= [],[],[]
 
