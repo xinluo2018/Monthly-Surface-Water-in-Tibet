@@ -1,4 +1,4 @@
-## author: luo xin, date: 2021.6.18
+## author: luo xin, creat: 2021.6.18, modify: 2021.7.14
 
 import numpy as np
 from osgeo import gdal
@@ -7,6 +7,8 @@ from osgeo import osr
 ### tiff image reading
 def readTiff(path_in):
     '''
+    arg:
+        path_in: image path
     return: 
         img: numpy array, exent: tuple, (x_min, x_max, y_min, y_max) 
         proj info, and dimentions: (row, col, band)
@@ -17,7 +19,7 @@ def readTiff(path_in):
     im_bands =RS_Data.RasterCount  # 
     im_geotrans = RS_Data.GetGeoTransform()  # 
     im_proj = RS_Data.GetProjection()  # 
-    img_array = RS_Data.ReadAsArray(0, 0, im_col, im_row)  # 
+    img_array = RS_Data.ReadAsArray(0, 0, im_col, im_row).astype(np.float)  # 
     left = im_geotrans[0]
     up = im_geotrans[3]
     right = left + im_geotrans[1] * im_col + im_geotrans[2] * im_row
@@ -30,7 +32,7 @@ def readTiff(path_in):
                     'bands': im_bands}
 
     if im_bands > 1:
-        img_array = np.transpose(img_array, (1, 2, 0)).astype(np.float)  # 
+        img_array = np.transpose(img_array, (1, 2, 0)) # 
         return img_array, img_info 
     else:
         return img_array, img_info
@@ -42,6 +44,7 @@ def writeTiff(im_data, im_geotrans, im_geosrs, path_out):
         im_data: tow dimentions (order: row, col),or three dimentions (order: row, col, band)
         im_geosrs: espg code correspond to image spatial reference system.
     '''
+    im_data = np.squeeze(im_data)
     if 'int8' in im_data.dtype.name:
         datatype = gdal.GDT_Byte
     elif 'int16' in im_data.dtype.name:

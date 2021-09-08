@@ -15,9 +15,9 @@ def read_normalize(paths_as, paths_des, paths_truth):
     scene_list, truth_list = [],[]
     for i in range(len(paths_as)):
         ## --- data reading
-        ascend, ascend_info = readTiff(paths_as[i])
-        descend, descend_info = readTiff(paths_des[i])
-        truth, truth_info = readTiff(paths_truth[i])
+        ascend, _ = readTiff(paths_as[i])
+        descend, _ = readTiff(paths_des[i])
+        truth, _ = readTiff(paths_truth[i])
         ## --- data normalization 
         scene = np.concatenate((ascend, descend), axis=-1)    
         scene, truth = normalize(max=s1_max, min=s1_min)(scene, truth)

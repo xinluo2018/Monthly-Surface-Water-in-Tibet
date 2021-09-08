@@ -1,11 +1,12 @@
+'''
+author: xin luo, 
+create: 2021.3.19
+des: 1. remote sensing image to patches and 2. patches to remote sensing image
+'''        
+
 import numpy as np
 
 class imgPatch():
-    '''
-    author: xin luo, date: 2021.3.19
-    description: 1. remote sensing image to patches
-                 2. patches to remote sensing image 
-    '''
     def __init__(self, img, patch_size, edge_overlay):
         ''' edge_overlay = left overlay or, right overlay
         edge_overlay should be an even number. '''
@@ -16,32 +17,36 @@ class imgPatch():
         self.img = img[:,:,np.newaxis] if len(img.shape) == 2 else img
         self.img_row = img.shape[0]
         self.img_col = img.shape[1]
+        self.img_patch_row = np.nan    # valid when call toPatch
+        self.img_patch_col = np.nan
+        self.start_list = []       #  
 
     def toPatch(self):
         '''
-        description: convert img to patches. 
+        des: 
+            convert img to patches. 
         return: 
             patch_list, contains all generated patches.
             start_list, contains all start positions(row, col) of the generated patches. 
         '''
         patch_list = []
-        start_list = []
         patch_step = self.patch_size - self.edge_overlay
         img_expand = np.pad(self.img, ((self.edge_overlay, patch_step),
                                           (self.edge_overlay, patch_step), (0,0)), 'constant')
-        img_patch_row = (img_expand.shape[0]-self.edge_overlay)//patch_step
-        img_patch_col = (img_expand.shape[1]-self.edge_overlay)//patch_step
-        for i in range(img_patch_row):
-            for j in range(img_patch_col):
+        self.img_patch_row = (img_expand.shape[0]-self.edge_overlay)//patch_step
+        self.img_patch_col = (img_expand.shape[1]-self.edge_overlay)//patch_step
+        for i in range(self.img_patch_row):
+            for j in range(self.img_patch_col):
                 patch_list.append(img_expand[i*patch_step:i*patch_step+self.patch_size,
-                                                j*patch_step:j*patch_step+self.patch_size, :])
-                start_list.append([i*patch_step-self.edge_overlay, j*patch_step-self.edge_overlay])
-        return patch_list, start_list, img_patch_row, img_patch_col
+                                                        j*patch_step:j*patch_step+self.patch_size, :])
+                self.start_list.append([i*patch_step-self.edge_overlay, j*patch_step-self.edge_overlay])
+        return patch_list
 
-    def higher_patch_crop(self, higher_patch_size, start_list):
+    def higher_patch_crop(self, higher_patch_size):
         '''
-        author: xin luo, date: 2021.3.19
-        description: crop the higher-scale patch (centered by the given low-scale patch)
+        des: 
+            crop the higher-scale patch (centered by the given low-scale patch)
+                (!!note: the toPatch() should be firstly called when use higher_patch_crop())
         input:
             img, np.array, the original image
             patch_size, int, the lower-scale patch size
@@ -55,21 +60,26 @@ class imgPatch():
         patch_step = self.patch_size - self.edge_overlay
         img_expand = np.pad(self.img, ((self.edge_overlay, patch_step), (self.edge_overlay, patch_step), (0,0)), 'constant')
         img_expand_higher = np.pad(img_expand, ((radius_bias, radius_bias), (radius_bias, radius_bias), (0,0)), 'constant')
-        start_list_new = list(np.array(start_list)+self.edge_overlay+radius_bias)
+        start_list_new = list(np.array(self.start_list)+self.edge_overlay+radius_bias)
         for start_i in start_list_new:
             higher_row_start, higher_col_start = start_i[0]-radius_bias, start_i[1]-radius_bias
-            higher_patch = img_expand_higher[higher_row_start:higher_row_start+higher_patch_size,higher_col_start:higher_col_start+higher_patch_size,:]
+            higher_patch = img_expand_higher[higher_row_start:higher_row_start+higher_patch_size, \
+                                                            higher_col_start:higher_col_start+higher_patch_size,:]
             higher_patch_list.append(higher_patch)
         return higher_patch_list
 
-    def toImage(self, patch_list, img_patch_row, img_patch_col):
+    def toImage(self, patch_list):
+        '''
+        des: 
+            merge patches into one image. 
+            (!!note: the toPatch() should be firstly called when use toImage())
+        '''
         patch_list = [patch[self.edge_overlay//2:-self.edge_overlay//2, self.edge_overlay//2:-self.edge_overlay//2,:]
                                                         for patch in patch_list]
-        patch_list = [np.hstack((patch_list[i*img_patch_col:i*img_patch_col+img_patch_col]))
-                                                        for i in range(img_patch_row)]
+        patch_list = [np.hstack((patch_list[i*self.img_patch_col:i*self.img_patch_col+self.img_patch_col]))
+                                                        for i in range(self.img_patch_row)]
         img_array = np.vstack(patch_list)
         img_array = img_array[self.edge_overlay//2:self.img_row+self.edge_overlay//2, \
             self.edge_overlay//2:self.img_col+self.edge_overlay//2,:]
-        
         return img_array
 

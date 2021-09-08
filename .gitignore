@@ -3,4 +3,6 @@ data/*
 .vscode
 .DS_Store
 *__pycache__/
-model/pretrained
+model/pretrained/*
+!model/pretrained/model_scales_gate_weights.pth
+
