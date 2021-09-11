@@ -2,7 +2,7 @@
 from utils.geotif_io import readTiff
 import torch
 import numpy as np
-from utils.preprocess import crop_scales
+from dataloader.preprocess import crop_scales
 
 class scene_path_dset(torch.utils.data.Dataset):
     '''sentinel-1 ascending/descending image and the truth reading

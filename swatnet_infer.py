@@ -21,6 +21,8 @@ import argparse
 import torch
 from utils.imgPatch import imgPatch
 import scipy.ndimage
+import gc
+from utils.get_s1pair_nor import get_s1pair_nor
 from utils.geotif_io import readTiff, writeTiff
 from model.seg_model.model_scales_gate import unet_scales_gate
 
@@ -100,9 +102,11 @@ def swatnet_infer(s1_img, model):
     '''
 
     ### ---- 1. Convert remote sensing image to multi-scale patches ----
-    print('convert image to multi-scale pathes input...')
+    print('--- convert image to multi-scale pathes input...')
     patch_low_list, patch_mid_list, patch_high_list, imgPat_ins = \
                             img2patchin(s1_img, scales = [256, 512, 2048], overlay=60)
+    del s1_img
+    gc.collect()
 
     ## formating data from 3d to 4d torch.tensor
     patch_high_list_ = [torch.from_numpy(patch.transpose(2,0,1)[np.newaxis,:]).float() \
@@ -113,21 +117,25 @@ def swatnet_infer(s1_img, model):
                                                                     for patch in patch_low_list]
     inputs = tuple(zip(patch_high_list_, patch_mid_list_, patch_low_list_)) 
     print('number of multi-scale patches:', len(inputs))
+    del patch_high_list_, patch_mid_list_, patch_low_list_
+    gc.collect()
 
     ### ---- 2. prediction by pretrained model -----
-    print('surface water mapping using swatnet model...')
+    print('--- surface water mapping using swatnet model...')
     pred_patch_list = model_pred(model=model, inputs=inputs)
+    del inputs
+    gc.collect()
 
     ### ---- 3. Convert the patches to image ----
-    print('comvert patch result to image result...')
+    print('--- comvert patch result to image result...')
     pred_patch_list = [np.squeeze(patch, axis = 0).permute(1, 2, 0) for patch in pred_patch_list]
     pro_map = imgPat_ins.toImage(pred_patch_list)
     wat_map = np.where(pro_map>0.5, 1, 0)
 
     return wat_map
 
-
 if __name__ == '__main__':
+
     args = get_args()
     ifile_as = args.ifile_as
     ifile_des = args.ifile_des
@@ -151,6 +159,7 @@ if __name__ == '__main__':
                 io_files.append((i_as, i_des, o_water))   
             else:
                 continue
+    io_files = sorted(io_files)
 
     '''Model loading'''
     model_name= 'model_scales_gate'
@@ -170,30 +179,32 @@ if __name__ == '__main__':
         
         ### ---- 1. preprocessing
         ### ---- 1.1 data reading
-        print('data reading...')
+        print('--- data reading...')
         print(io_files[i][0])
         print(io_files[i][1])
         s1_ascend, s1_ascend_info = readTiff(path_in = io_files[i][0])
         s1_descend, _ = readTiff(path_in = io_files[i][1])
-        s1_img = np.concatenate((s1_ascend, s1_descend), axis=2)
-        print('image shape:', s1_img.shape)
-
-        ### ---- 1.2. image normalization ----
-        print('data normalization...')
-        s1_img_nor = s1_img.copy()
-        for j in range(s1_img.shape[-1]):
-            s1_img_nor[:,:,j] = (s1_img[:,:,j] - s1_min[j])/(s1_max[j]-s1_min[j]+0.0001)
+        ### --- 1.2 get normalized s1_image
+        s1_img_nor = get_s1pair_nor(s1_as=s1_ascend, s1_des=s1_descend)
+        print('image shape:', s1_img_nor.shape)
+        del s1_ascend, s1_descend
+        gc.collect()
 
         ### ---- 2. surface water mapping ----
-        print('surface water mapping using swatnet model...')
+        print('--- surface water mapping using swatnet model...')
         wat_map = swatnet_infer(s1_img=s1_img_nor, model=model)
+        del s1_img_nor
+        gc.collect()
 
         ### ---- 3. write out the water map -----
-        print('write out the result image...')
-        writeTiff(im_data = wat_map.astype(np.int8), 
+        print('--- write out the result image...')
+        writeTiff(im_data = wat_map.astype(np.uint8), 
                     im_geotrans = s1_ascend_info['geotrans'], 
                     im_geosrs = s1_ascend_info['geosrs'], 
                     path_out = io_files[i][2])
-        print('write out -->')
+        print('--- write out -->')
         print(io_files[i][2])
+        del wat_map
+        gc.collect()
+
 

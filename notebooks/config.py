@@ -2,8 +2,8 @@
 import torch
 import torch.nn as nn
 from model.loss import FocalLoss
-from utils.img_aug import rotate, flip, torch_noise, missing, numpy2tensor
-from utils.img_aug import colorjitter, bandjitter
+from dataloader.img_aug import rotate, flip, torch_noise, missing, numpy2tensor
+from dataloader.img_aug import colorjitter, bandjitter
 
 ## ------------- Path -------------- ##
 # -------- root directory --------  #

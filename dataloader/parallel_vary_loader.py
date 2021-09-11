@@ -3,7 +3,7 @@ from numpy.lib.function_base import delete
 import torch
 import threading as td
 from queue import Queue
-from utils.preprocess import crop, crop_scales
+from dataloader.preprocess import crop, crop_scales
 import random
 import numpy as np
 import cv2

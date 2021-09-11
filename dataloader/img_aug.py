@@ -1,4 +1,6 @@
-'''author: xin luo, created: 2021.7.8'''
+## author: xin luo, 
+## created: 2021.7.8
+## des: data augmentation before model training.
 
 import torch
 import random

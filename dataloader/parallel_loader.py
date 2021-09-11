@@ -2,8 +2,7 @@
 import torch
 import threading as td
 from queue import Queue
-from utils.preprocess import crop_scales,crop
-import random
+from dataloader.preprocess import crop_scales, crop
 import numpy as np
 import cv2
 import gc
