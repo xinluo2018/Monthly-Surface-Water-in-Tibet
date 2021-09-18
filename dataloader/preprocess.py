@@ -49,7 +49,6 @@ def read_normalize(paths_as, paths_des, paths_truth):
     return scene_list, truth_list
 
 
-
 def crop(image, truth, size=(256, 256)):
     ''' numpy-based
         des: randomly crop corresponding to specific size
@@ -61,11 +60,12 @@ def crop(image, truth, size=(256, 256)):
     ptruth = truth[start_h:start_h+size[0], start_w:start_w+size[1]]
     return patch, ptruth
 
+
 class crop_scales:
     ''' numpy-based
-        des: randomly crop corresponding to specific size
+        des: randomly crop multiple-scale patches (from high to low)
         input scales: tuple or list (high -> low)
-        we design a multi-thread processsing
+        we design a multi-thread processsing for resizing
     '''
     def __init__(self, scales=(2048, 512, 256), threads=False):
         self.scales = scales

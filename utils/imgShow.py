@@ -1,9 +1,11 @@
 ## author: xin luo
-## create: 2020, modify: 2021.9.1
+## create: 2020, modify: 2021.9.13
 
 
 import matplotlib.pyplot as plt
 import numpy as np
+import gc
+
 
 def imgShow(img, extent=None, color_bands=(2,1,0), \
                             clip_percent=2, per_band_clip='False', focus=None):
@@ -43,7 +45,11 @@ def imgShow(img, extent=None, color_bands=(2,1,0), \
             img_color = np.expand_dims(img, axis=2)
         else:
             img_color = img[:,:,[color_bands[0], color_bands[1], color_bands[2]]]    
+        del img
+        gc.collect()
+
         img_color_clip = np.zeros_like(img_color)
+
         if per_band_clip == 'True':
             for i in range(img_color.shape[-1]):
                 if clip_percent == 0:
@@ -60,7 +66,6 @@ def imgShow(img, extent=None, color_bands=(2,1,0), \
             img_color_clip = (img_color-img_color_hist[0])\
                                      /(img_color_hist[1]-img_color_hist[0]+0.0001)
         plt.imshow(np.clip(img_color_clip, 0, 1), extent=extent, vmin=0,vmax=1)
-
 
 
 def imsShow(img_list, img_name_list, clip_list=None, \

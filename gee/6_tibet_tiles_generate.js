@@ -1,19 +1,16 @@
 ///////////////////////////////////////////////////////////
 // Author: xin luo
-// Create: 2021.08.30, modify: 2021.09.05
+// Create: 2021.08.30, modify: 2021.09.12
 // Description: split the tibet region into multiple tiles.
 ///////////////////////////////////////////////////////////
 
 // Study area
-var area_tb = ee.FeatureCollection('users/xin_luo/SAR_Water_Extraction/TPBoundary_HF');
-var area_tb = area_tb.geometry()
-var area_tb_bound = area_tb.bounds();
+var tb_area = ee.FeatureCollection('users/xin_luo/SAR_Water_Extraction/TPBoundary_HF');
+var tb_area = tb_area.geometry()
+var tb_area_bound = tb_area.bounds();
 
-print('area_tb_buf', area_tb_bound)
+print('tb_area_buf', tb_area_bound)
 
-// *******************************************************************
-// ------ 1. generate tiles
-// *******************************************************************
 
 // var generate_grid = function(xmin, ymin, xmax, ymax, dx, dy) {
 //     // how to use: var tiles = generate_grid(xmin, ymin, xmax, ymax, dx_utm, dy_utm)
@@ -36,7 +33,7 @@ print('area_tb_buf', area_tb_bound)
 // }
 
 
-function generate_grid(lonmin, latmin, lonmax, latmax, dx_utm, dy_utm, buf, tile_num) {
+function generate_grid(lonmin, latmin, lonmax, latmax, dx_utm, dy_utm, tile_num) {
 
   var xx = ee.List.sequence(1, tile_num, 1)
   function add_xtile(num, ls){
@@ -64,20 +61,20 @@ function generate_grid(lonmin, latmin, lonmax, latmax, dx_utm, dy_utm, buf, tile
     return tiles_ls.add(rect_);
     
   }
-  var tiles_geo = xx.iterate(add_xtile, [])
+  var tiles_geo = xx.iterate(add_xtile, []);
 
-  //---- region buffer ----
-  var tiles_geo_buf = ee.List(tiles_geo).map(function add_buf(fea) {
+  function fill_gap(fea) {
       var fea_ = ee.Feature(fea);
       var proj = ee.String(fea_.get('proj'));
-      return fea_.buffer({'distance': 10000, 'proj': proj}).bounds(10)}
-      )
+      return fea_.buffer({'distance': 2000, 'proj': proj}).bounds(10)}
 
-  return ee.FeatureCollection(tiles_geo_buf.flatten())
+  var tiles_geo_ = ee.List(tiles_geo).map(fill_gap)
+
+  return ee.FeatureCollection(tiles_geo_.flatten())
 }
 
 //// parameters
-var region_coord = area_tb_bound.coordinates()
+var region_coord = tb_area_bound.coordinates()
 var region_lon_min = region_coord.flatten().get(0)
 var region_lat_min = region_coord.flatten().get(1)
 var region_lon_max = region_coord.flatten().get(4)
@@ -85,7 +82,7 @@ var region_lat_max = region_coord.flatten().get(5)
 
 print('region:', region_lon_min,region_lon_max,region_lat_min,region_lat_max)
 var tile_num = 500
-var buf = 10000
+var buffer = 10000
 var dx_utm = 100000        // 100 km
 var dy_utm = 100000
 var lonmin = region_lon_min
@@ -93,56 +90,74 @@ var lonmax = region_lon_max
 var latmin = region_lat_min
 var latmax = region_lat_max
 
-// ----- generate tiles
-var tiles_tb = generate_grid(lonmin, latmin, lonmax, latmax, dx_utm, dy_utm, buf, tile_num)
+// *******************************************************************
+// ------ 1. generate tiles
+// *******************************************************************
+var tb_tiles = generate_grid(lonmin, latmin, lonmax, latmax, dx_utm, dy_utm, tile_num)
 
 // *******************************************************************
 // ----- 2. remove empty grid and add region buffer
 // *******************************************************************
 function remove_tile(fea){
-    var inter_ = area_tb.intersects({'right': fea.geometry(), 'maxError': 10});
+    var inter_ = tb_area.intersects({'right': fea.geometry(), 'maxError': 10});
     var fea_1 = fea.set('intersection', inter_);   //  intersection
     var fea_2 = fea_1.set('area', fea_1.area({'maxError':10}).divide(1000000));  // set area 
     return fea_2
 }
 
-var tiles_tb = tiles_tb.map(remove_tile).filterMetadata('intersection','equals', true)
+var tb_tiles = tb_tiles.map(remove_tile).filterMetadata('intersection','equals', true)
 
 // *******************************************************************
 // ----- 3. add tile id: 1,2...
 // *******************************************************************
 function add_tiles_id(fea, tiles_tb){
     var tiles_ls = ee.List(tiles_tb);
-    var id = tiles_ls.size();
-    return tiles_ls.add(fea.set('tile_id', id));
+    var id = tiles_ls.size().add(ee.Number(1));
+    var id_ = ee.String(id.add(1000)).slice(1);
+    return tiles_ls.add(fea.set('tile_id', id_));
 }
-var tiles_final = tiles_tb.iterate(add_tiles_id, []);
 
-var tiles_final = ee.FeatureCollection(ee.List(tiles_final).flatten())  // convert ee.List to ee.FeatureCollection
-print('tile final:',tiles_final)
+var tb_tiles = tb_tiles.iterate(add_tiles_id, []);
+var tb_tiles = ee.FeatureCollection(ee.List(tb_tiles).flatten())  // convert ee.List to ee.FeatureCollection
+
+print('tb_tile:', tb_tiles)
+
+
+// *******************************************************************
+// ----- 4. add buffer region for tiles
+// *******************************************************************
+function add_buf(fea) {
+    // var fea_ = ee.Feature(fea);
+    var proj = ee.String(fea.get('proj'));
+    var fea_buf = fea.buffer({'distance': buffer}).bounds(10)
+    var fea_buf_ = fea_buf.set('area', fea_buf.area({'maxError':10}).divide(1000000));
+    return fea_buf_
+}
+
+
+var tb_tiles_buf = tb_tiles.map(add_buf)
+
+print('tb_tiles_buf:', tb_tiles_buf)
 
 // //// outline visualization of the study area.
 var empty = ee.Image().byte();
 var tb_outline = empty.paint({
-    featureCollection: area_tb, color: 1, width: 3});
+    featureCollection: tb_area, color: 1, width: 3});
 var tb_bound = empty.paint({
-    featureCollection: area_tb_bound, color: 1, width: 3});
+    featureCollection: tb_area_bound, color: 1, width: 3});
 
 Map.setCenter(86.0, 32.0, 4);
-Map.addLayer(tiles_final, {}, 'tiles_final')
+Map.addLayer(tb_tiles, {}, 'tb_tiles')
+Map.addLayer(tb_tiles_buf, {}, 'tb_tiles_buf')
 Map.addLayer(tb_outline, {palette: 'FF0000'}, 'Tibet_outline');
 Map.addLayer(tb_bound, {palette: '0000FF'}, 'Tibet_bound');
 
 
-// // Export an ee.FeatureCollection as an Earth Engine asset.
+// Export an ee.FeatureCollection as an Earth Engine asset.
 // Export.table.toAsset({
-//   collection: tiles_final,
-//   description:'tibet_tiles',
-//   assetId: 'tibet_tiles',
+//     collection: tb_tiles_buf,
+//     description:'tibet_tiles_buf',
+//     assetId: 'tibet_tiles_buf',
 // });
-
-
-
-
 
 

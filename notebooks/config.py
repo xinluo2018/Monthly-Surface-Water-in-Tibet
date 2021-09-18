@@ -7,16 +7,17 @@ from dataloader.img_aug import colorjitter, bandjitter
 
 ## ------------- Path -------------- ##
 # -------- root directory --------  #
-root = "/home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet"
+root_tb_data = '/mnt/data-tibet'
+root_proj = "/home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet"
 
 # ------------ data directory -------------- #
 # --- scene dir path for training ---
-dir_as = root+'/data/s1_ascend'
-dir_des = root+'/data/s1_descend'
-dir_truth = root+'/data/s1_truth'
+dir_as = root_proj + '/data/s1_ascend'
+dir_des = root_proj + '/data/s1_descend'
+dir_truth = root_proj + '/data/s1_truth'
 
 # --- patch dir for validation ---
-dir_patch_val = root+'/data/val_patches'
+dir_patch_val = root_proj + '/data/val_patches'
 
 
 ## --------- data loader -------- ##
@@ -24,14 +25,14 @@ s1_min = [-57.78, -70.37, -58.98, -68.47]  # as-vv, as-vh, des-vv, des-vh
 s1_max = [25.98, 10.23, 29.28, 17.60]   # as-vv, as-vh, des-vv, des-vh
 
 transforms_tra = [
-        colorjitter(prob=0.5),
-        bandjitter(prob=0.5),
-        rotate(prob=0.3), 
-        flip(prob=0.3), 
-        missing(prob=0.3, ratio_max = 0.25),
+        colorjitter(prob=0.5),    # numpy-based
+        bandjitter(prob=0.5),     # numpy-based
+        rotate(prob=0.3),         # numpy-based
+        flip(prob=0.3),           # numpy-based
+        missing(prob=0.3, ratio_max = 0.25),   # numpy-based
         numpy2tensor(), 
-        torch_noise(prob=0.3, std_min=0.005, std_max=0.1),
-        ]
+        torch_noise(prob=0.3, std_min=0.005, std_max=0.1),      # tensor-based
+                ]
 
 ## ---------- model training ------- ##
 # ----- parameter setting

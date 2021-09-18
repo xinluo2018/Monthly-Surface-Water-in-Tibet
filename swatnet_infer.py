@@ -1,7 +1,7 @@
 '''
-author: xin luo,
+author: xin luo
 creat: 2021.9.8
-des: 
+des:
     perform surface water mapping by using pretrained watnet
     through funtional api and command line, respectively.
 example:
@@ -10,7 +10,7 @@ example:
         !!note: rsimg value: [0,1]
     command line: 
         python swatnet_infer.py data/tibet_tiles/s1_ascend/*.tif -des data/tibet_tiles/s1_descend/*.tif
-    !!note: 
+    !!note:
         the rsimg value should be in [0,1], 
         while the .tif format image should be the original value
 '''
@@ -22,7 +22,8 @@ import torch
 from utils.imgPatch import imgPatch
 import scipy.ndimage
 import gc
-from utils.get_s1pair_nor import get_s1pair_nor
+
+# from utils.get_s1pair_nor import get_s1pair_nor
 from utils.geotif_io import readTiff, writeTiff
 from model.seg_model.model_scales_gate import unet_scales_gate
 
@@ -60,6 +61,16 @@ def get_args():
 
     return parser.parse_args()
 
+def get_s1pair_nor(s1_as, s1_des):
+    '''read in and normalize the s1 acending and descending pair image'''
+    s1_img = np.concatenate((s1_as, s1_des), axis=2)
+    ## normalization.
+    for band in range(s1_img.shape[-1]):
+        s1_img[:,:,band] = (s1_img[:,:,band] - s1_min[band])/(s1_max[band]-s1_min[band]+0.0001)
+    s1_img = np.clip(s1_img, 0., 1.) 
+    s1_img[np.isnan(s1_img)]=0         # remove nan value
+    return s1_img
+
 
 def img2patchin(img, scales = [256, 512, 2048], overlay=60):
     ratio_mid, ratio_high = scales[1]//scales[0], scales[2]//scales[0],
@@ -90,8 +101,8 @@ def model_pred(model, inputs):
     return pred_patch_list
 
 
-def swatnet_infer(s1_img, model):
-    
+def swatnet_infer(s1_img, model): 
+       
     ''' des: surface water mapping by using pretrained watnet
         arg:
             img: np.array, sentinel-1 backscattering values(!!data value: 0-1): ; 
@@ -102,7 +113,7 @@ def swatnet_infer(s1_img, model):
     '''
 
     ### ---- 1. Convert remote sensing image to multi-scale patches ----
-    print('--- convert image to multi-scale pathes input...')
+    print('-- convert image to multi-scale pathes input...')
     patch_low_list, patch_mid_list, patch_high_list, imgPat_ins = \
                             img2patchin(s1_img, scales = [256, 512, 2048], overlay=60)
     del s1_img
@@ -115,19 +126,22 @@ def swatnet_infer(s1_img, model):
                                                                     for patch in patch_mid_list]
     patch_low_list_ = [torch.from_numpy(patch.transpose(2,0,1)[np.newaxis,:]).float() \
                                                                     for patch in patch_low_list]
+    del patch_high_list, patch_mid_list, patch_low_list
+    gc.collect()
+
     inputs = tuple(zip(patch_high_list_, patch_mid_list_, patch_low_list_)) 
     print('number of multi-scale patches:', len(inputs))
     del patch_high_list_, patch_mid_list_, patch_low_list_
     gc.collect()
 
     ### ---- 2. prediction by pretrained model -----
-    print('--- surface water mapping using swatnet model...')
+    print('-- surface water mapping using swatnet model...')
     pred_patch_list = model_pred(model=model, inputs=inputs)
     del inputs
     gc.collect()
 
     ### ---- 3. Convert the patches to image ----
-    print('--- comvert patch result to image result...')
+    print('-- comvert patch result to image result...')
     pred_patch_list = [np.squeeze(patch, axis = 0).permute(1, 2, 0) for patch in pred_patch_list]
     pro_map = imgPat_ins.toImage(pred_patch_list)
     wat_map = np.where(pro_map>0.5, 1, 0)

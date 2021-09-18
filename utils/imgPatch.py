@@ -1,8 +1,7 @@
-'''
-author: xin luo, 
-create: 2021.3.19
-des: 1. remote sensing image to patches and 2. patches to remote sensing image
-'''        
+### author: xin luo, 
+### create: 2021.3.19
+### des: 1. remote sensing image to patches and 
+#        2. patches to remote sensing image
 
 import numpy as np
 

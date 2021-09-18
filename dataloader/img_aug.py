@@ -1,12 +1,61 @@
 ## author: xin luo, 
 ## created: 2021.7.8
 ## des: data augmentation before model training.
+#       note: the 3-d np.array() is channel-first.
+
 
 import torch
 import random
 import copy
 import numpy as np
 import torchvision.transforms as transforms
+
+
+
+#### ----------------------------------------------
+#### ------- scene-based augmentation ------- ####
+#### ----------------------------------------------
+
+class line_missing:
+    '''
+    numpy-based
+    des: add line missing to the scene
+    args:
+        prob: probability for determine line missing or not.
+    '''
+    def __init__(self, prob=0.5):
+        self.p = prob
+
+    def __call__(self, scene):
+        '''img: 3-d np.array (!channel-first), input image '''
+        min_length = 50  # the height and width should both larger than min_length        
+        if random.random() > self.p:
+            return scene
+        else:
+            height_img, width_img = scene.shape[1], scene.shape[2]
+            img_missing = scene.copy()
+            row_start = random.randint(0, height_img-min_length-1) 
+            col_start = random.randint(0, width_img-min_length-1)
+            length = random.randint(min_length, \
+                            min(np.array([height_img, width_img]) - np.array([row_start,col_start]))-1)
+            width_line = random.randint(1, 3) 
+            degree = random.random()*2
+            lengths = np.linspace(0, length-1, length)[...,np.newaxis]
+            if width_line >1:
+                row_start = np.linspace(row_start, row_start+width_line-1, width_line)[np.newaxis,...]
+                col_start = np.linspace(col_start, col_start+width_line-1, width_line)[np.newaxis,...]
+            row_rot = lengths*np.sin(degree)+row_start
+            col_rot = lengths*np.cos(degree)+col_start
+            row_rot = row_rot.flatten().astype(np.int)
+            col_rot = col_rot.flatten().astype(np.int)
+            img_missing[:, row_rot, col_rot] = 0
+            return img_missing
+
+
+
+#### ----------------------------------------------
+#### patch-based augmentation
+#### ----------------------------------------------
 
 class numpy2tensor:
     '''des: np.array to torch.Tensor
@@ -19,8 +68,6 @@ class numpy2tensor:
         ptruth_tensor = torch.from_numpy(ptruth.copy())
         return patch_group_tensor, ptruth_tensor
 
-#### ------------- numpy-based ---------------
-#### -----------------------------------------
 
 class rotate:
     '''numpy-based
@@ -64,9 +111,11 @@ class flip:
             truth_flip = np.flip(truth, 1)
         return patches_flip, truth_flip
 
+
+
 class missing:
     '''numpy-based
-       des: randomly stripe missing'''
+       des: randomly stripe missing on randomly scale.'''
     def __init__(self, prob=0.5, ratio_max = 0.25):
         self.p = prob
         self.ratio_max = ratio_max
@@ -183,8 +232,6 @@ class bandjitter:
 
 
 
-#### -------------- torch-based ----------------
-#### -------------------------------------------
 class torch_rotate:
     '''torch-based
        des: randomly rotation with given probability
@@ -229,8 +276,8 @@ class torch_noise:
 
 
 class torch_colorjitter:
-    '''torch-based colorjitter, it is different from color_bias
-       des: randomly colorjitter with given probability
+    '''torch-based colorjitter.
+       des: randomly colorjitter with given probability, note: it is different from color_bias
        color jitter contains bright adjust, contrast adjust, saturation and hue adjust
        color jitter is performed for per band.
        '''

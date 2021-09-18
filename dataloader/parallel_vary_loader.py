@@ -1,3 +1,8 @@
+## author: xin luo
+## create: 2021.9.15
+## des: compared with paraller_loader, the patch size is varing 
+#       from 128 to the minimal of image height/width, 
+
 
 from numpy.lib.function_base import delete
 import torch
@@ -10,16 +15,18 @@ import cv2
 import gc
 
 def scenes2patches_vary(scene_list, truth_list, transforms):  
-    '''des: comparing to scenes2patches, the num of patch is only one, and the size is random croped'''  
+    '''des: comparing to scenes2patches, the num of patch is only one, 
+            and the patch size is random generated'''  
     patch_list, ptruth_list = [],[]
      #'''convert image to patches group'''
     zip_data = list(zip(scene_list, truth_list))
     for scene, truth in zip_data:
-        scene, truth = scene[:,892:-892,892:-892], truth[892:-892,892:-892]
-        size_crop = random.randint(128, min(truth.shape))
+        scene, truth = scene[:, 892:-892, 892:-892], truth[892:-892, 892:-892]
+        size_crop = random.randint(128, min(truth.shape))    ## patch size: > 128, <min(truth.shape)
         patch, ptruth = crop(scene, truth, size=(size_crop, size_crop))
-        patch = [cv2.resize(patch[i], dsize=(256, 256), interpolation=cv2.INTER_LINEAR) \
-                                                                    for i in range(patch.shape[0])]
+        ## resize to (256, 256)
+        patch = [cv2.resize(patch[i], dsize=(256, 256), \
+                            interpolation=cv2.INTER_LINEAR) for i in range(patch.shape[0])]
         patch = np.array(patch)
         ptruth = cv2.resize(ptruth, dsize=(256, 256), interpolation=cv2.INTER_LINEAR)
         for transform in transforms:
