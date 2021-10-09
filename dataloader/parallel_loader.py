@@ -6,9 +6,8 @@ import torch
 import threading as td
 from queue import Queue
 from dataloader.preprocess import crop_scales, crop
-from dataloader.img_aug import line_missing
+from dataloader.img_aug import missing_line, missing_band
 import numpy as np
-import cv2
 import gc
 
 def scenes2patches(scene_list, truth_list, transforms, scales=[2048, 512, 256]):    
@@ -58,7 +57,7 @@ class threads_scene_dset(torch.utils.data.Dataset):
         self.truth_list = truth_list 
         self.num_thread = num_thread
         # !!! significantly improve the performance. 
-        self.scene_list = [line_missing(prob=0.3)(scene=scene) for scene in self.scene_list]   
+        self.scene_list = [missing_line(prob=0.3)(scene=scene) for scene in self.scene_list]
         self.patches_list, self.ptruth_list = threads_read(\
                                         scene_list, truth_list, transforms, num_thread)
         self.transforms = transforms
@@ -70,7 +69,8 @@ class threads_scene_dset(torch.utils.data.Dataset):
             del self.patches_list, self.ptruth_list
             gc.collect()
             # !!! significantly improve the performance.
-            self.scene_list = [line_missing(prob=0.3)(scene=scene) for scene in self.scene_list]   
+            self.scene_list = [missing_line(prob=0.3)(scene=scene) for scene in self.scene_list]
+            # self.scene_list = [missing_band(prob=0.1)(scene=scene) for scene in self.scene_list]
             self.patches_list, self.ptruth_list = threads_read(\
                             self.scene_list, self.truth_list, self.transforms, self.num_thread)
         return patch, truth

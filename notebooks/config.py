@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 from model.loss import FocalLoss
-from dataloader.img_aug import rotate, flip, torch_noise, missing, numpy2tensor
+from dataloader.img_aug import rotate, flip, torch_noise, missing_region, numpy2tensor
 from dataloader.img_aug import colorjitter, bandjitter
 
 ## ------------- Path -------------- ##
@@ -29,7 +29,7 @@ transforms_tra = [
         bandjitter(prob=0.5),     # numpy-based
         rotate(prob=0.3),         # numpy-based
         flip(prob=0.3),           # numpy-based
-        missing(prob=0.3, ratio_max = 0.25),   # numpy-based
+        missing_region(prob=0.3, ratio_max = 0.25),   # numpy-based
         numpy2tensor(), 
         torch_noise(prob=0.3, std_min=0.005, std_max=0.1),      # tensor-based
                 ]

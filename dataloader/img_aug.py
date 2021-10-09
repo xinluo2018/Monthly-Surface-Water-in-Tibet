@@ -16,9 +16,9 @@ import torchvision.transforms as transforms
 #### ------- scene-based augmentation ------- ####
 #### ----------------------------------------------
 
-class line_missing:
+class missing_line:
     '''
-    numpy-based
+    scene-based, numpy-based
     des: add line missing to the scene
     args:
         prob: probability for determine line missing or not.
@@ -52,6 +52,30 @@ class line_missing:
             return img_missing
 
 
+class missing_band:
+    '''scene-based, numpy-based
+       des: randomly 2-bands (ascending/descending) missing.
+            this augmentation is due to the randomly data missing 
+            in term of ascending and descending bands in tibet, respectively.
+       '''
+    def __init__(self, prob=0.5):
+        self.p = prob
+    def __call__(self, scene):
+        if random.random() > self.p:
+            return scene
+        else:
+            scene_miss = scene.copy()
+            h_scene, w_scene = scene.shape[1], scene.shape[2]
+            row_start, col_start = random.randint(0, h_scene-100), random.randint(0, w_scene-100)
+            h_miss = random.randint(100, h_scene-row_start)
+            w_miss = random.randint(100, w_scene-col_start)
+            if random.random() > 0.5:
+                scene_miss[0:2, row_start:row_start+h_miss, col_start:col_start+w_miss] = 0
+            else:
+                scene_miss[2:4, row_start:row_start+h_miss, col_start:col_start+w_miss] = 0
+
+            return scene_miss
+        
 
 #### ----------------------------------------------
 #### patch-based augmentation
@@ -70,7 +94,7 @@ class numpy2tensor:
 
 
 class rotate:
-    '''numpy-based
+    '''patch-based, numpy-based
        des: randomly rotation with given probability
        '''
     def __init__(self, prob=0.5):
@@ -89,7 +113,7 @@ class rotate:
         return patches_rot, truth_rot
 
 class flip: 
-    '''numpy-based
+    '''patch-based, numpy-based
        des: randomly flip with given probability '''
     def __init__(self, prob=0.5):
         self.p = prob
@@ -113,8 +137,8 @@ class flip:
 
 
 
-class missing:
-    '''numpy-based
+class missing_region:
+    '''patch-based, numpy-based
        des: randomly stripe missing on randomly scale.'''
     def __init__(self, prob=0.5, ratio_max = 0.25):
         self.p = prob
@@ -143,7 +167,7 @@ class missing:
         return patches_miss, truth
 
 class noise:
-    '''numpy-based 
+    '''patch-based, numpy-based 
        !!! slower than torch-based 
        des: add randomly noise with given randomly standard deviation
     '''
@@ -169,7 +193,7 @@ class noise:
             return patches_noisy, truth
 
 class colorjitter:
-    '''numpy-based
+    '''patch-based, numpy-based
        des: randomly colorjitter with given probability, 
        color jitter contains bright adjust and contrast adjust.
        color jitter is performed for per band.
@@ -209,7 +233,7 @@ class colorjitter:
         return patches_aug, truth
 
 class bandjitter:
-    '''numpy-based
+    '''patch-based, numpy-based
        des: randomly bandjitter with given probability, 
        '''
     def __init__(self, prob=0.5):
@@ -233,7 +257,7 @@ class bandjitter:
 
 
 class torch_rotate:
-    '''torch-based
+    '''patch-based, torch-based
        des: randomly rotation with given probability
        '''
     def __init__(self, prob=0.5):
@@ -251,7 +275,7 @@ class torch_rotate:
         return patches_rot, truth_rot
 
 class torch_noise:
-    '''torch-based: faster than numpy-based
+    '''patch-based, torch-based (faster than numpy-based).
        des: add randomly noise with given randomly standard deviation
     '''
     def __init__(self, prob=0.5, std_min=0.001, std_max =0.1):
@@ -276,7 +300,7 @@ class torch_noise:
 
 
 class torch_colorjitter:
-    '''torch-based colorjitter.
+    '''patch-based, torch-based.
        des: randomly colorjitter with given probability, note: it is different from color_bias
        color jitter contains bright adjust, contrast adjust, saturation and hue adjust
        color jitter is performed for per band.

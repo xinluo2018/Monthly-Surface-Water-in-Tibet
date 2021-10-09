@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////
 // Author: xin luo
-// Create: 2021.08.31
+// Create: 2021.08.31, modify: 2021.09.20
 // Description: export the tiled images in tibet.
 //////////////////////////////////////////////////////////////
 
 
 var bands_s1 = ['VV', 'VH']
-
+var scale_DN = 100          // decrease the export size of image
 
 // Study area
 var area_tb = ee.FeatureCollection('users/xin_luo/SAR_Water_Extraction/TPBoundary_HF');
@@ -25,7 +25,6 @@ print('s1_imgid_des:', s1_imgid_des)
 
 // ********************************************************
 //////////////////////// Data export //////////////////////
-/////////////  note: should set as/des manunally //////////
 // ********************************************************
 // --- 1. obtain s1 images
 function get_id(fea, ls){
@@ -47,14 +46,19 @@ print('s1_imgs_as -- >', s1_imgs_as)
 //     }
 // var s1_imgs_as = s1_imgs_as.map(remove_edge)
 
-var s1_img_as = s1_imgs_as.mosaic().float()   // mosaic imgs into img
-var s1_img_des = s1_imgs_des.mosaic().float()   
+
+// var s1_img_as = s1_imgs_as.mosaic().float()   // mosaic imgs into img
+// var s1_img_des = s1_imgs_des.mosaic().float()   
+var s1_img_as = s1_imgs_as.mosaic().multiply(scale_DN).int16()    // convert double to int16
+var s1_img_des = s1_imgs_des.mosaic().multiply(scale_DN).int16() 
+
+
 print('s1_img_as_mosaic -- >', s1_img_as)
-Map.addLayer(s1_img_as.select('VH'), {min: -50, max: 1}, 'ascendVH')
+Map.addLayer(s1_img_as.select('VH'), {min: -50*scale_DN, max: 1*scale_DN}, 'ascendVH')
 Map.addLayer(tb_tiles_buf, {}, 'tb_tiles_buf')
 
-// ---2 export tiled images
-for (var i = 0; i < 30; i++){
+// // ---2 export tiled images
+for (var i = 241; i < 250; i++){
   // define tile name
   var tb_tiles_ls = tb_tiles_buf.toList(10000)
   var tile = tb_tiles_ls.get(i)
@@ -63,6 +67,7 @@ for (var i = 0; i < 30; i++){
   var tile_name_as = 'tibet_s1as_202008_tile_' + tile_id.getInfo()
   var tile_name_des = 'tibet_s1des_202008_tile_' + tile_id.getInfo()
   print('output tile -->', tile_name_as, tile_name_des)
+
   // // export image: ascending and descending
   // Export.image.toDrive({
   //     image: s1_img_as,

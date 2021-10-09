@@ -1,4 +1,6 @@
 data/*
+!data/dset_loc
+!data/dset_s1_ascend/s1_as_scene_01.tif
 .venv
 .vscode
 .DS_Store

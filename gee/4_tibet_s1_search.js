@@ -1,12 +1,14 @@
 ///////////////////////////////////////////////////////
 // Author: xin luo
-// Create: 2020.11.13, modify: 2021.08.27
+// Create: 2020.11.13, modify: 2021.10.02
 // Description: select the sentinel-1 images that fully cover the tibetan plateau
 ///////////////////////////////////////////////////////
 
 // Study area
 var area_tb = ee.FeatureCollection('users/xin_luo/SAR_Water_Extraction/TPBoundary_HF');
 var area_tb_bound = area_tb.geometry().bounds();
+var s1_img_area = ee.Number(42000000000)
+
 // date of the collected data
 var start_time = '2020-08-01'
 var end_time = '2020-08-30'
@@ -53,41 +55,57 @@ var valid_percent_func = function(image){
     var img_count = image_count.getNumber('VV')
                           .min(image_count.getNumber('VH'))
                           .divide(ee.Number(7000000))
-    return image.set('valid_per', img_count)  
+    return image.set('valid_value_per', img_count)  
     }
 
 
 var ascendCol = ascendCol.map(valid_percent_func)
-                         .filterMetadata('valid_per', 'greater_than', 0.90)
+                         .filterMetadata('valid_value_per', 'greater_than', 0.80)
 var descendCol= descendCol.map(valid_percent_func)
-                         .filterMetadata('valid_per','greater_than', 0.90)
+                         .filterMetadata('valid_value_per','greater_than', 0.80)
 
 print('filtered ascend images:', ascendCol.size(), ascendCol)
 print('filtered descend images:', descendCol.size(), descendCol)
 
-// ---- 3. remove the redundant image which at the same location
-var area_intersec_thre = ee.Number(ascendCol.first().geometry().area()).multiply(0.8);
+
+//// ---- 3. remove the images which cover small area.
+
+var add_area = function(image){
+  var area = image.geometry().area();
+  return image.set('area', area);
+  }
+ascendCol = ascendCol.map(add_area)
+            .filterMetadata('area', 'greater_than', s1_img_area.multiply(0.5))
+descendCol = descendCol.map(add_area)
+            .filterMetadata('area', 'greater_than', s1_img_area.multiply(0.5))
+
+
+// ---- 4. remove the redundant image which at the same location
+var area_add_thre = s1_img_area.multiply(0.15);
+
 var region_exclusive_func = function(image, imgCol_list){
     var imgCol_ls = ee.List(imgCol_list);
     var imgCol_ls_geo = ee.ImageCollection(imgCol_ls).union().geometry();
     var image_geo = image.geometry();
     var image_inter_area = imgCol_ls_geo.intersection(image_geo).area();
-    return imgCol_ls.add(image.set('area_intersec', image_inter_area))
-}
+    var area_add = ee.Number(image_geo.area())
+                            .subtract(ee.Number(image_inter_area)) 
+    return imgCol_ls.add(image.set('area_add', area_add))
+  }
 
 var ascendCol_sel = ee.ImageCollection(
                       ee.List(ascendCol.iterate(region_exclusive_func, [])))
-                      .filterMetadata('area_intersec', 'less_than', area_intersec_thre)
+                      .filterMetadata('area_add', 'greater_than', area_add_thre)
                         
 var descendCol_sel = ee.ImageCollection(
                       ee.List(descendCol.iterate(region_exclusive_func, [])))
-                      .filterMetadata('area_intersec', 'less_than', area_intersec_thre)
+                      .filterMetadata('area_add', 'greater_than', area_add_thre)
               
 print('selected ascend images:', ascendCol_sel.size(), ascendCol_sel)
 print('selected descend images:', descendCol_sel.size(), descendCol_sel)
 
 
-// ------ 4. add image footprint and id
+// ------ 5. add image footprint and id
 function generate_img_id(img){
     var img_geo = img.geometry();
     var img_id = ee.String('COPERNICUS/S1_GRD/').cat(img.id())
@@ -109,11 +127,27 @@ print('as_fp_id:', as_fp_id)
 //   assetId: 'tibet_s1_202008_as',
 // });
 
+// //// export to drive
+// Export.table.toDrive({
+//     collection: as_fp_id,
+//     description: 's1_as_footprint',
+//     folder: 'tibet_sar_data',
+//     fileFormat: "KML"
+//     })
+
 // Export.table.toAsset({
 //   collection: des_fp_id,
 //   description:'tibet_s1_202008_des',
 //   assetId: 'tibet_s1_202008_des',
 // });
+
+// Export.table.toDrive({
+//     collection: des_fp_id,
+//     description: 's1_des_footprint',
+//     folder: 'tibet_sar_data',
+//     fileFormat: "KML"
+//   })
+
 
 
 ////**********************************************************////
@@ -138,5 +172,4 @@ Map.addLayer(descendCol_sel.select('VV'), {min: -50, max: 1}, 'descendVV');
 Map.addLayer(as_fprint_outline, {palette: 'FF00FF'}, 'as_footprint');
 Map.addLayer(des_fprint_outline, {palette: '000000'}, 'des_footprint');
 Map.addLayer(tb_outline, {palette: 'FF0000'}, 'Tibet_outline');
-
 

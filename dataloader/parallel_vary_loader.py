@@ -1,7 +1,9 @@
 ## author: xin luo
 ## create: 2021.9.15
 ## des: compared with paraller_loader, the patch size is varing 
-#       from 128 to the minimal of image height/width, 
+#       from 128 to the minimal of image height/width, and the size
+#       then be resized to 256x256. in fact, we made the input resolution
+#       varing 
 
 
 from numpy.lib.function_base import delete
