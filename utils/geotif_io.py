@@ -49,7 +49,7 @@ def writeTiff(im_data, im_geotrans, im_geosrs, path_out):
     if 'int8' in im_data.dtype.name:
         datatype = gdal.GDT_Byte
     elif 'int16' in im_data.dtype.name:
-        datatype = gdal.GDT_UInt16
+        datatype = gdal.GDT_Int16
     else:
         datatype = gdal.GDT_Float32
     if len(im_data.shape) == 3:

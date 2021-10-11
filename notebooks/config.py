@@ -7,17 +7,17 @@ from dataloader.img_aug import colorjitter, bandjitter
 
 ## ------------- Path -------------- ##
 # -------- root directory --------  #
-root_tb_data = '/mnt/data-tibet'
+root_tb_data = '/myDrive/tibet-water'
 root_proj = "/home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet"
 
 # ------------ data directory -------------- #
 # --- scene dir path for training ---
-dir_as = root_proj + '/data/s1_ascend'
-dir_des = root_proj + '/data/s1_descend'
-dir_truth = root_proj + '/data/s1_truth'
+dir_as = root_proj + '/data/dset/s1_ascend'
+dir_des = root_proj + '/data/dset/s1_descend'
+dir_truth = root_proj + '/data/dset/s1_truth'
 
 # --- patch dir for validation ---
-dir_patch_val = root_proj + '/data/val_patches'
+dir_patch_val = root_proj + '/data/dset/val_patches'
 
 
 ## --------- data loader -------- ##

@@ -1,10 +1,29 @@
-data/*
-!data/dset_loc
-!data/dset_s1_ascend/s1_as_scene_01.tif
+## data/dset
+data/dset/s1_ascend/*
+!data/dset/s1_ascend/s1_as_scene_01.tif
+data/dset/s1_descend/*
+!data/dset/s1_descend/s1_des_scene_01.tif
+data/dset/s2_img/*
+data/dset/s1_truth/*
+!data/dset/s1_truth/s1_scene_01_truth.tif
+data/dset/s1_water
+data/dset/s2_img/*
+# !data/dset/s2_img/scene01_s2_img.tif    # over 100M
+data/dset/val_patches
+
+## data/tibet
+data/tibet/dem/*
+!data/tibet/dem/tibet_SRTMGL3_down.tif
+data/tibet/tibet-plateau-boundary/*
+!data/tibet/tibet-plateau-boundary/TPBoundary_HF
+
+## pretained model
+model/pretrained/*
+!model/pretrained/model_scales_gate_001_weights.pth
+
+## the other
 .venv
 .vscode
 .DS_Store
 *__pycache__/
-model/pretrained/*
-!model/pretrained/model_scales_gate_weights.pth
 
