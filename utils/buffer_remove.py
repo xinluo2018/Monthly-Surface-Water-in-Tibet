@@ -1,12 +1,12 @@
 ## author: xin luo
 ## create: 2021.9.13
-
+## modify: 2021.10.13
 
 from utils.geotif_io import readTiff, writeTiff
 from utils.transform_xy import coor2coor, geo2imagexy
 
 
-def buffer_remove(path_in, path_out, extent):
+def buffer_remove(path_in, path_out, extent, save=True):
     '''
     des: subset image with the given extent
     arg:
@@ -24,8 +24,8 @@ def buffer_remove(path_in, path_out, extent):
     row_max, col_max = geo2imagexy(x=extent[1], y=extent[2], gdal_trans=imgtrans)
     img_subs = img[row_min:row_max, col_min:col_max]
     imgtrans_subs = (extent[0], imgtrans[1], imgtrans[2], extent[3], imgtrans[4], imgtrans[5])
-
-    writeTiff(im_data=img_subs, im_geotrans=imgtrans_subs, im_geosrs=imgsrs, path_out=path_out)
+    if save:
+        writeTiff(im_data=img_subs, im_geotrans=imgtrans_subs, im_geosrs=imgsrs, path_out=path_out)
 
     return img_subs, imgtrans_subs
 

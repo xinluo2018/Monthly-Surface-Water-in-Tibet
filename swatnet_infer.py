@@ -59,6 +59,10 @@ def get_args():
         '-o', metavar='odir', dest='odir', type=str, nargs='+', 
         default=None, help=('directory to write'))
 
+    # parser.add_argument(
+    #     '-s', metavar='scale', dest='scale', type=str, nargs='+', 
+    #     default=None, help=('DN scale of the sentinel-1 image'))
+
     return parser.parse_args()
 
 def get_s1pair_nor(s1_as, s1_des):
@@ -199,6 +203,7 @@ if __name__ == '__main__':
         s1_ascend, s1_ascend_info = readTiff(path_in = io_files[i][0])
         s1_descend, _ = readTiff(path_in = io_files[i][1])
         ### --- 1.2 get normalized s1_image
+        s1_ascend, s1_descend = np.float32(s1_ascend)/100, np.float32(s1_descend)/100
         s1_img_nor = get_s1pair_nor(s1_as=s1_ascend, s1_des=s1_descend)
         print('image shape:', s1_img_nor.shape)
         del s1_ascend, s1_descend

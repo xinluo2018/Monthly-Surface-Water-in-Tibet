@@ -1,8 +1,11 @@
+## author: xin luo, 
+## created: 2021.7.8
+## modify: 2021.10.13
 
 import torch
 import torch.nn as nn
 from model.loss import FocalLoss
-from dataloader.img_aug import rotate, flip, torch_noise, missing_region, numpy2tensor
+from dataloader.img_aug import missing_band_p, rotate, flip, torch_noise, missing_region, numpy2tensor
 from dataloader.img_aug import colorjitter, bandjitter
 
 ## ------------- Path -------------- ##
@@ -26,10 +29,11 @@ s1_max = [25.98, 10.23, 29.28, 17.60]   # as-vv, as-vh, des-vv, des-vh
 
 transforms_tra = [
         colorjitter(prob=0.5),    # numpy-based
-        bandjitter(prob=0.5),     # numpy-based
+        # bandjitter(prob=0.5),     # numpy-based
         rotate(prob=0.3),         # numpy-based
         flip(prob=0.3),           # numpy-based
         missing_region(prob=0.3, ratio_max = 0.25),   # numpy-based
+        missing_band_p(prob=0.1, ratio_max = 1),   # numpy-based
         numpy2tensor(), 
         torch_noise(prob=0.3, std_min=0.005, std_max=0.1),      # tensor-based
                 ]

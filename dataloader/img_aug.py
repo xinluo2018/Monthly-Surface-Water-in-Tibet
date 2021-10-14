@@ -1,5 +1,6 @@
 ## author: xin luo, 
 ## created: 2021.7.8
+## modify: 2021.10.13
 ## des: data augmentation before model training.
 #       note: the 3-d np.array() is channel-first.
 
@@ -10,16 +11,15 @@ import copy
 import numpy as np
 import torchvision.transforms as transforms
 
-
-
 #### ----------------------------------------------
-#### ------- scene-based augmentation ------- ####
+#### ------- scene-based augmentation ------- #### 
 #### ----------------------------------------------
 
 class missing_line:
     '''
     scene-based, numpy-based
     des: add line missing to the scene
+    note: the missing_line is perfrom on the data loading
     args:
         prob: probability for determine line missing or not.
     '''
@@ -73,7 +73,6 @@ class missing_band:
                 scene_miss[0:2, row_start:row_start+h_miss, col_start:col_start+w_miss] = 0
             else:
                 scene_miss[2:4, row_start:row_start+h_miss, col_start:col_start+w_miss] = 0
-
             return scene_miss
         
 
@@ -136,7 +135,6 @@ class flip:
         return patches_flip, truth_flip
 
 
-
 class missing_region:
     '''patch-based, numpy-based
        des: randomly stripe missing on randomly scale.'''
@@ -164,6 +162,45 @@ class missing_region:
             start_w = random.randint(0, h_img-h_miss)
             patches_miss[:,start_h:start_h+h_miss, start_w:start_w+w_miss] = 0
 
+        return patches_miss, truth
+
+class missing_band_p:
+    '''patch-based, numpy-based
+       des: randomly 2-bands (ascending/descending) missing.
+            this augmentation is due to the randomly data missing 
+            in term of ascending and descending bands in tibet, respectively.'''
+    def __init__(self, prob=0.5, ratio_max = 1):
+        self.p = prob
+        self.ratio_max = ratio_max
+    def __call__(self, patches, truth):
+        if random.random() > self.p:
+            return patches, truth
+        # else:
+        patches_miss = copy.deepcopy(patches)
+        h_img = truth.shape[0]
+        miss_max = int(h_img*self.ratio_max)
+        thre = random.random()
+        if isinstance(patches, list):
+            for i in range(len(patches)):
+                h_miss = random.randint(0, miss_max)
+                w_miss = random.randint(0, miss_max)
+                start_h = random.randint(0, h_img-h_miss)
+                start_w = random.randint(0, h_img-h_miss)
+                if thre > 0.5:
+                    patches_miss[i][0:2,start_h:start_h+h_miss, start_w:start_w+w_miss] = 0
+                else:
+                    patches_miss[i][2:4,start_h:start_h+h_miss, start_w:start_w+w_miss] = 0                    
+
+        else: 
+            h_miss = random.randint(0, miss_max)
+            w_miss = random.randint(0, miss_max)
+            start_h = random.randint(0, h_img-h_miss)
+            start_w = random.randint(0, h_img-h_miss)
+            if thre > 0.5:
+                patches_miss[0:2,start_h:start_h+h_miss, start_w:start_w+w_miss] = 0
+            else:
+                patches_miss[2:4,start_h:start_h+h_miss, start_w:start_w+w_miss] = 0                    
+                    
         return patches_miss, truth
 
 class noise:
@@ -308,7 +345,7 @@ class torch_colorjitter:
     def __init__(self, prob=0.5):
         self.p = prob
         self.toPIL = transforms.ToPILImage()
-        self.colorjit = transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1)
+        self.colorjit = transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1)
         self.toTensor = transforms.ToTensor()
     def __call__(self, patches, truth):
         '''image, truth: torch.Tensor'''

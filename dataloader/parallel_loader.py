@@ -71,6 +71,7 @@ class threads_scene_dset(torch.utils.data.Dataset):
             # !!! significantly improve the performance.
             self.scene_list = [missing_line(prob=0.3)(scene=scene) for scene in self.scene_list]
             # self.scene_list = [missing_band(prob=0.1)(scene=scene) for scene in self.scene_list]
+
             self.patches_list, self.ptruth_list = threads_read(\
                             self.scene_list, self.truth_list, self.transforms, self.num_thread)
         return patch, truth
