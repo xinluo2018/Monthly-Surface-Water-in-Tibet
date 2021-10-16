@@ -256,7 +256,7 @@ class colorjitter:
                 band_aug = np.clip(band_aug, 0, 1)
                 patches_aug.append(band_aug)
             patches_aug = np.concatenate(patches_aug, 0)
-            patches_aug = [patches_aug[0:num_band],patches_aug[num_band:2*num_band],patches_aug[2*num_band:]]
+            patches_aug = [patches_aug[0:num_band], patches_aug[num_band:2*num_band], patches_aug[2*num_band:]]
         else: 
             patches_aug = []
             for i in range(patches.shape[0]):                

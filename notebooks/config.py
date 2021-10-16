@@ -30,12 +30,12 @@ s1_max = [25.98, 10.23, 29.28, 17.60]   # as-vv, as-vh, des-vv, des-vh
 transforms_tra = [
         colorjitter(prob=0.5),    # numpy-based
         # bandjitter(prob=0.5),     # numpy-based
-        rotate(prob=0.3),         # numpy-based
-        flip(prob=0.3),           # numpy-based
-        missing_region(prob=0.3, ratio_max = 0.25),   # numpy-based
-        missing_band_p(prob=0.1, ratio_max = 1),   # numpy-based
+        rotate(prob=0.5),         # numpy-based
+        flip(prob=0.5),           # numpy-based
+        missing_region(prob=0.2, ratio_max = 0.25),   # numpy-based
+        missing_band_p(prob=0.2, ratio_max = 1),   # numpy-based
         numpy2tensor(), 
-        torch_noise(prob=0.3, std_min=0.005, std_max=0.1),      # tensor-based
+        torch_noise(prob=0.5, std_min=0.005, std_max=0.1),      # tensor-based
                 ]
 
 ## ---------- model training ------- ##

@@ -53,24 +53,24 @@ class unet_scales_gate(nn.Module):
 
         self.gate_layers = nn.ModuleList([
             nn.Sequential(nn.Conv2d(in_channels=64, out_channels=1, kernel_size=1),
-                          nn.Tanh()),
-                        #   nn.Sigmoid()),  
+                        #   nn.Tanh()),
+                          nn.Sigmoid()),  
 
             nn.Sequential(nn.Conv2d(in_channels=64+32, out_channels=1, kernel_size=1),
-                          nn.Tanh()),
-                        #   nn.Sigmoid()),
+                        #   nn.Tanh()),
+                          nn.Sigmoid()),
 
             nn.Sequential(nn.Conv2d(in_channels=64+32, out_channels=1, kernel_size=1),
-                          nn.Tanh()),
-                        #   nn.Sigmoid()),
+                        #   nn.Tanh()),
+                          nn.Sigmoid()),
 
             nn.Sequential(nn.Conv2d(in_channels=64+16, out_channels=1, kernel_size=1),
-                          nn.Tanh()),
-                        #   nn.Sigmoid()),
+                        #   nn.Tanh()),
+                          nn.Sigmoid()),
 
             nn.Sequential(nn.Conv2d(in_channels=32+16, out_channels=1, kernel_size=1),
-                          nn.Tanh()),
-                        #   nn.Sigmoid()),
+                        #   nn.Tanh()),
+                          nn.Sigmoid()),
                           ])
 
         self.up_last = upsample(in_channels=32+16*3, out_channels=32, scale=2)
