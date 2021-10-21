@@ -28,7 +28,7 @@ s1_min = [-57.78, -70.37, -58.98, -68.47]  # as-vv, as-vh, des-vv, des-vh
 s1_max = [25.98, 10.23, 29.28, 17.60]   # as-vv, as-vh, des-vv, des-vh
 
 transforms_tra = [
-        colorjitter(prob=0.5),    # numpy-based
+        colorjitter(prob=0.5, alpha=0.2, beta=0.2, t=0.1),    # numpy-based
         # bandjitter(prob=0.5),     # numpy-based
         rotate(prob=0.5),         # numpy-based
         flip(prob=0.5),           # numpy-based

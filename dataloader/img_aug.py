@@ -239,7 +239,7 @@ class colorjitter:
         self.p = prob
         self.alpha = alpha
         self.beta = beta
-        self.t = t
+        # self.t = t
     def __call__(self, patches, truth):
         '''image, truth: torch.Tensor'''
         if random.random() > self.p:
@@ -251,8 +251,9 @@ class colorjitter:
             for i in range(patches_cat.shape[0]):
                 alpha = random.uniform(1-self.alpha, 1+self.alpha)
                 beta = random.uniform(-self.beta, self.beta)
-                t = random.uniform(-self.t, self.t)
-                band_aug = alpha*(patches_cat[i:i+1]-t)+beta
+                # t = random.uniform(-self.t, self.t)
+                # band_aug = alpha*(patches_cat[i:i+1]-t)+beta
+                band_aug = alpha*patches_cat[i:i+1]+beta
                 band_aug = np.clip(band_aug, 0, 1)
                 patches_aug.append(band_aug)
             patches_aug = np.concatenate(patches_aug, 0)
@@ -262,8 +263,9 @@ class colorjitter:
             for i in range(patches.shape[0]):                
                 alpha = random.uniform(1-self.alpha, 1+self.alpha)
                 beta = random.uniform(-self.beta, self.beta)
-                t = random.uniform(-self.t, self.t)
-                band_aug = alpha*(patches[i:i+1]-t)+beta
+                # t = random.uniform(-self.t, self.t)
+                # band_aug = alpha*(patches[i:i+1]-t)+beta
+                band_aug = alpha*patches[i:i+1]+beta
                 band_aug = np.clip(band_aug, 0, 1)
                 patches_aug.append(band_aug)
             patches_aug = np.concatenate(patches_aug, 0)
