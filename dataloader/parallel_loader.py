@@ -1,12 +1,14 @@
 ## author: xin luo
 ## create: 2021.9.15
-## des: 
+## des: parallel data(scene to patch) loading 
+## note: the line missing is in the data loading.
 
 import torch
 import threading as td
 from queue import Queue
 from dataloader.preprocess import crop_scales, crop
-from dataloader.img_aug import missing_line, missing_band
+# from dataloader.img_aug import missing_line, missing_band
+from notebooks.config import missing_line_aug
 import numpy as np
 import gc
 
@@ -57,7 +59,8 @@ class threads_scene_dset(torch.utils.data.Dataset):
         self.truth_list = truth_list 
         self.num_thread = num_thread
         # !!! significantly improve the performance. 
-        self.scene_list = [missing_line(prob=0.3)(scene=scene) for scene in self.scene_list]
+        # self.scene_list = [missing_line(prob=0.3)(scene=scene) for scene in self.scene_list]
+        self.scene_list = [missing_line_aug()(scene=scene) for scene in self.scene_list]
         self.patches_list, self.ptruth_list = threads_read(\
                                         scene_list, truth_list, transforms, num_thread)
         self.transforms = transforms
@@ -69,7 +72,8 @@ class threads_scene_dset(torch.utils.data.Dataset):
             del self.patches_list, self.ptruth_list
             gc.collect()
             # !!! significantly improve the performance.
-            self.scene_list = [missing_line(prob=0.3)(scene=scene) for scene in self.scene_list]
+            # self.scene_list = [missing_line(prob=0.3)(scene=scene) for scene in self.scene_list]
+            self.scene_list = [missing_line_aug()(scene=scene) for scene in self.scene_list]
             # self.scene_list = [missing_band(prob=0.1)(scene=scene) for scene in self.scene_list]
 
             self.patches_list, self.ptruth_list = threads_read(\
@@ -78,5 +82,4 @@ class threads_scene_dset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.patches_list)
-
 

@@ -1,3 +1,7 @@
+## author: xin luo
+## create: 2021.10.26
+## des: function for ploting the obtained metrics, e.g., loss, oa.
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt

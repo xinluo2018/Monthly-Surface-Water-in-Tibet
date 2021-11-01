@@ -30,8 +30,8 @@ class imgPatch():
         '''
         patch_list = []
         patch_step = self.patch_size - self.edge_overlay
-        img_expand = np.pad(self.img, ((self.edge_overlay, patch_step),
-                                          (self.edge_overlay, patch_step), (0,0)), 'constant')
+        img_expand = np.pad(self.img, ((self.edge_overlay, self.patch_size),
+                                          (self.edge_overlay, self.patch_size), (0,0)), 'constant')
         self.img_patch_row = (img_expand.shape[0]-self.edge_overlay)//patch_step
         self.img_patch_col = (img_expand.shape[1]-self.edge_overlay)//patch_step
         for i in range(self.img_patch_row):
@@ -56,9 +56,10 @@ class imgPatch():
         '''
         higher_patch_list = []
         radius_bias = higher_patch_size//2-self.patch_size//2
-        patch_step = self.patch_size - self.edge_overlay
-        img_expand = np.pad(self.img, ((self.edge_overlay, patch_step), (self.edge_overlay, patch_step), (0,0)), 'constant')
-        img_expand_higher = np.pad(img_expand, ((radius_bias, radius_bias), (radius_bias, radius_bias), (0,0)), 'constant')
+        img_expand = np.pad(self.img, ((self.edge_overlay, self.patch_size), \
+                                            (self.edge_overlay, self.patch_size), (0,0)), 'constant')
+        img_expand_higher = np.pad(img_expand, ((radius_bias, radius_bias), \
+                                            (radius_bias, radius_bias), (0,0)), 'constant')
         start_list_new = list(np.array(self.start_list)+self.edge_overlay+radius_bias)
         for start_i in start_list_new:
             higher_row_start, higher_col_start = start_i[0]-radius_bias, start_i[1]-radius_bias

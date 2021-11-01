@@ -9,7 +9,7 @@ example:
         water_map = swatnet_infer(rsimg) 
         !!note: rsimg value: [0,1]
     command line: 
-        python swatnet_infer.py data/tibet_tiles/s1_ascend/*.tif -des data/tibet_tiles/s1_descend/*.tif
+        python swatnet_infer.py data/tibet_tiles/s1_ascend/*.tif -des data/tibet_tiles/s1_descend/*.tif -s 100
     !!note:
         the rsimg value should be in [0,1], 
         while the .tif format image should be the original value
@@ -28,7 +28,8 @@ from utils.geotif_io import readTiff, writeTiff
 from model.seg_model.model_scales_gate import unet_scales_gate
 
 ## default path of the pretrained watnet model
-path_swatnet_w = 'model/pretrained/model_scales_gate_weights.pth'
+path_swatnet_w = 'model/pretrained/model_scales_gate_weights_app_001.pth'
+
 s1_min = [-57.78, -70.37, -58.98, -68.47]   # as-vv, as-vh, des-vv, des-vh
 s1_max = [25.98, 10.23, 29.28, 17.60]       # as-vv, as-vh, des-vv, des-vh
 
@@ -59,9 +60,9 @@ def get_args():
         '-o', metavar='odir', dest='odir', type=str, nargs='+', 
         default=None, help=('directory to write'))
 
-    # parser.add_argument(
-    #     '-s', metavar='scale', dest='scale', type=str, nargs='+', 
-    #     default=None, help=('DN scale of the sentinel-1 image'))
+    parser.add_argument(
+        '-s', metavar='scale_DN', dest='scale_DN', type=int, nargs='+', 
+        default=[None], help=('DN scale of the sentinel-1 image'))
 
     return parser.parse_args()
 
@@ -116,7 +117,7 @@ def swatnet_infer(s1_img, model):
             water_map: np.array.
     '''
 
-    ### ---- 1. Convert remote sensing image to multi-scale patches ----
+    ### ---- 1. Convert image to multi-scale patches ----
     print('-- convert image to multi-scale pathes input...')
     patch_low_list, patch_mid_list, patch_high_list, imgPat_ins = \
                             img2patchin(s1_img, scales = [256, 512, 2048], overlay=60)
@@ -159,6 +160,7 @@ if __name__ == '__main__':
     ifile_des = args.ifile_des
     path_model_w = args.model
     odir = args.odir
+    scale_DN = args.scale_DN[0]
 
     ''' Obtain pair-wise ascending/descending files.'''
     io_files = []
@@ -203,7 +205,8 @@ if __name__ == '__main__':
         s1_ascend, s1_ascend_info = readTiff(path_in = io_files[i][0])
         s1_descend, _ = readTiff(path_in = io_files[i][1])
         ### --- 1.2 get normalized s1_image
-        s1_ascend, s1_descend = np.float32(s1_ascend)/100, np.float32(s1_descend)/100
+        if scale_DN: 
+            s1_ascend, s1_descend = np.float32(s1_ascend)/scale_DN, np.float32(s1_descend)/scale_DN
         s1_img_nor = get_s1pair_nor(s1_as=s1_ascend, s1_des=s1_descend)
         print('image shape:', s1_img_nor.shape)
         del s1_ascend, s1_descend

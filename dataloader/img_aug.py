@@ -235,7 +235,7 @@ class colorjitter:
        color jitter contains bright adjust and contrast adjust.
        color jitter is performed for per band.
        '''
-    def __init__(self, prob=0.5, alpha=0.1, beta=0.1, t=0.1):
+    def __init__(self, prob=0.5, alpha=0.1, beta=0.1):
         self.p = prob
         self.alpha = alpha
         self.beta = beta
@@ -246,14 +246,17 @@ class colorjitter:
             return patches, truth        
         if isinstance(patches, list):
             num_band = patches[0].shape[0]
+            alpha, beta = [], []
+            for i in range(patches[0].shape[0]):
+                alpha.append(random.uniform(1-self.alpha, 1+self.alpha)) 
+                beta.append(random.uniform(-self.beta, self.beta))
+            for i in range(len(patches)):
+                alpha += alpha
+                beta += beta
             patches_cat = np.concatenate(patches, 0)
             patches_aug = []
             for i in range(patches_cat.shape[0]):
-                alpha = random.uniform(1-self.alpha, 1+self.alpha)
-                beta = random.uniform(-self.beta, self.beta)
-                # t = random.uniform(-self.t, self.t)
-                # band_aug = alpha*(patches_cat[i:i+1]-t)+beta
-                band_aug = alpha*patches_cat[i:i+1]+beta
+                band_aug = alpha[i]*patches_cat[i:i+1]+beta[i]
                 band_aug = np.clip(band_aug, 0, 1)
                 patches_aug.append(band_aug)
             patches_aug = np.concatenate(patches_aug, 0)
@@ -263,8 +266,6 @@ class colorjitter:
             for i in range(patches.shape[0]):                
                 alpha = random.uniform(1-self.alpha, 1+self.alpha)
                 beta = random.uniform(-self.beta, self.beta)
-                # t = random.uniform(-self.t, self.t)
-                # band_aug = alpha*(patches[i:i+1]-t)+beta
                 band_aug = alpha*patches[i:i+1]+beta
                 band_aug = np.clip(band_aug, 0, 1)
                 patches_aug.append(band_aug)
@@ -338,39 +339,39 @@ class torch_noise:
         return patches_noisy, truth
 
 
-class torch_colorjitter:
-    '''patch-based, torch-based.
-       des: randomly colorjitter with given probability, note: it is different from color_bias
-       color jitter contains bright adjust, contrast adjust, saturation and hue adjust
-       color jitter is performed for per band.
-       '''
-    def __init__(self, prob=0.5):
-        self.p = prob
-        self.toPIL = transforms.ToPILImage()
-        self.colorjit = transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1)
-        self.toTensor = transforms.ToTensor()
-    def __call__(self, patches, truth):
-        '''image, truth: torch.Tensor'''
-        if random.random() > self.p:
-            return patches, truth
-        if isinstance(patches, list):
-            num_band = patches[0].shape[0]
-            patches_cat = torch.cat(patches, 0)
-            patches_aug = []
-            for i in range(patches_cat.shape[0]):
-                patch_coljit = self.toPIL(patches_cat[i:i+1])
-                patch_coljit = self.colorjit(patch_coljit)
-                patch_coljit = self.toTensor(patch_coljit)
-                patches_aug.append(patch_coljit)
-            patches_aug = torch.cat(patches_aug, 0)
-            patches_aug = [patches_aug[0:num_band],patches_aug[num_band:num_band+4],patches_aug[num_band+4:]]
-        else: 
-            patches_aug = []
-            for i in range(patches.shape[0]):
-                patch_coljit = self.toPIL(patches[i:i+1])
-                patch_coljit = self.colorjit(patch_coljit)
-                patch_coljit = self.toTensor(patch_coljit)
-                patches_aug.append(patch_coljit)
-            patches_aug = torch.cat(patches_aug, 0)
-        return patches_aug, truth
+# class torch_colorjitter:
+#     '''patch-based, torch-based.
+#        des: randomly colorjitter with given probability, note: it is different from color_bias
+#        color jitter contains bright adjust, contrast adjust, saturation and hue adjust
+#        color jitter is performed for per band.
+#        '''
+#     def __init__(self, prob=0.5):
+#         self.p = prob
+#         self.toPIL = transforms.ToPILImage()
+#         self.colorjit = transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1)
+#         self.toTensor = transforms.ToTensor()
+#     def __call__(self, patches, truth):
+#         '''image, truth: torch.Tensor'''
+#         if random.random() > self.p:
+#             return patches, truth
+#         if isinstance(patches, list):
+#             num_band = patches[0].shape[0]
+#             patches_cat = torch.cat(patches, 0)
+#             patches_aug = []
+#             for i in range(patches_cat.shape[0]):
+#                 patch_coljit = self.toPIL(patches_cat[i:i+1])
+#                 patch_coljit = self.colorjit(patch_coljit)
+#                 patch_coljit = self.toTensor(patch_coljit)
+#                 patches_aug.append(patch_coljit)
+#             patches_aug = torch.cat(patches_aug, 0)
+#             patches_aug = [patches_aug[0:num_band],patches_aug[num_band:num_band+4],patches_aug[num_band+4:]]
+#         else: 
+#             patches_aug = []
+#             for i in range(patches.shape[0]):
+#                 patch_coljit = self.toPIL(patches[i:i+1])
+#                 patch_coljit = self.colorjit(patch_coljit)
+#                 patch_coljit = self.toTensor(patch_coljit)
+#                 patches_aug.append(patch_coljit)
+#             patches_aug = torch.cat(patches_aug, 0)
+#         return patches_aug, truth
 
