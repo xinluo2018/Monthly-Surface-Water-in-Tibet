@@ -34,22 +34,22 @@ def missing_line_aug(prob = 0.3):    # implemented in the parallel_loader.py
     return missing_line(prob=prob)
 
 transforms_tra = [
-        colorjitter(prob=0.3, alpha=0.1, beta=0.1),    # numpy-based, !!!beta should be small
-        bandjitter(prob=0.3),     # numpy-based
+        # colorjitter(prob=0.3, alpha=0.1, beta=0.05),    # numpy-based, !!!beta should be small
+        # bandjitter(prob=0.3),     # numpy-based
         rotate(prob=0.3),         # numpy-based
         flip(prob=0.3),           # numpy-based
         # missing_region(prob=0.2, ratio_max = 0.25),   # numpy-based
-        missing_band_p(prob=0.3, ratio_max=1),    # numpy-based
+        # missing_band_p(prob=0.3, ratio_max=1),    # numpy-based
         numpy2tensor(), 
-        torch_noise(prob=0.3, std_min=0., std_max=0.1),      # tensor-based
+        torch_noise(prob=0.3, std_min=0, std_max=0.1),      # tensor-based
             ]
 
 ## ---------- model training ------- ##
 # ----- parameter setting
 epoch = 200
-lr = 0.001
+lr = 0.0005
 # lr = 0.01
-batch_size = 12
+batch_size = 16
 
 # ----- loss function
 loss_ce = nn.CrossEntropyLoss()

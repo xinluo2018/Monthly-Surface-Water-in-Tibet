@@ -7,12 +7,12 @@ des:
 example:
     funtional api:
         water_map = swatnet_infer(rsimg) 
-        !!note: rsimg value: [0,1]
+        !!note: the rsimg value should be in [0,1]
     command line: 
         python swatnet_infer.py data/tibet_tiles/s1_ascend/*.tif -des data/tibet_tiles/s1_descend/*.tif -s 100
-    !!note:
-        the rsimg value should be in [0,1], 
-        while the .tif format image should be the original value
+        !!note: 1. the .tif format image should be the original value, or scale * original value
+                2. the ascending image and descending image should be pair-wise, that is, the last number in 
+                   the image name should be the same. e.g., ascending_001.tif, descending_001.tif
 '''
 
 import os
@@ -28,7 +28,7 @@ from utils.geotif_io import readTiff, writeTiff
 from model.seg_model.model_scales_gate import unet_scales_gate
 
 ## default path of the pretrained watnet model
-path_swatnet_w = 'model/pretrained/model_scales_gate_weights_app_001.pth'
+path_swatnet_w = 'model/pretrained/model_scales_gate_weights_app_3.pth'
 
 s1_min = [-57.78, -70.37, -58.98, -68.47]   # as-vv, as-vh, des-vv, des-vh
 s1_max = [25.98, 10.23, 29.28, 17.60]       # as-vv, as-vh, des-vv, des-vh

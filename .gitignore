@@ -10,6 +10,8 @@ data/dset/s1_water
 data/dset/s2_img/*
 # !data/dset/s2_img/scene01_s2_img.tif    # over 100M
 data/dset/val_patches
+data/dset/s1_as_des/*
+
 
 ## data/tibet
 data/tibet/dem/*
