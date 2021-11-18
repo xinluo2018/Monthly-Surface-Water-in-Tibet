@@ -27,6 +27,8 @@ dir_patch_val = root_proj + '/data/dset/val_patches'
 ## --------- data loader -------- ##
 s1_min = [-57.78, -70.37, -58.98, -68.47]  # as-vv, as-vh, des-vv, des-vh
 s1_max = [25.98, 10.23, 29.28, 17.60]   # as-vv, as-vh, des-vv, des-vh
+# s1_min_per = [-25.95684, -38.16688, -29.07279, -38.11438]  # as-vv, as-vh, des-vv, des-vh
+# s1_max_per = [-2.58706, -12.21354, -2.91177, -12.68447]   # as-vv, as-vh, des-vv, des-vh
 
 
 
@@ -39,17 +41,18 @@ transforms_tra = [
         rotate(prob=0.3),         # numpy-based
         flip(prob=0.3),           # numpy-based
         # missing_region(prob=0.2, ratio_max = 0.25),   # numpy-based
-        # missing_band_p(prob=0.3, ratio_max=1),    # numpy-based
+        missing_band_p(prob=0.3, ratio_max=1),    # numpy-based
         numpy2tensor(), 
-        torch_noise(prob=0.3, std_min=0, std_max=0.1),      # tensor-based
+        torch_noise(prob=0.3, std_min=0, std_max=0.05),      # tensor-based
             ]
 
 ## ---------- model training ------- ##
 # ----- parameter setting
 epoch = 200
-lr = 0.0005
+# lr = 0.0001
+lr = 0.001
 # lr = 0.01
-batch_size = 16
+batch_size = 8
 
 # ----- loss function
 loss_ce = nn.CrossEntropyLoss()

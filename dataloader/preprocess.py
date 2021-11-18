@@ -10,15 +10,15 @@ import threading as td
 from queue import Queue
 
 ## max and min value for each band of the s1 image.
-s1_min = [-57.78, -70.37, -58.98, -68.47]  # as-vv, as-vh, des-vv, des-vh
-s1_max = [25.98, 10.23, 29.28, 17.60]
+# s1_min = [-57.78, -70.37, -58.98, -68.47]  # as-vv, as-vh, des-vv, des-vh
+# s1_max = [25.98, 10.23, 29.28, 17.60]
 
 
 class normalize:
     '''normalization with the given per-band max and min values'''
-    def __init__(self, max, min):
+    def __init__(self, max_bands, min_bands):
         '''max, min: list, values corresponding to each band'''
-        self.max, self.min = max, min
+        self.max, self.min = max_bands, min_bands
     def __call__(self, image, truth):
         for band in range(image.shape[-1]):
             image[:,:,band] = (image[:,:,band]-self.min[band])/(self.max[band]-self.min[band]+0.0001)
@@ -26,11 +26,12 @@ class normalize:
         return image, truth
 
 
-def read_normalize(paths_as, paths_des, paths_truth):
+def read_normalize(paths_as, paths_des, paths_truth, max_bands, min_bands):
     ''' des: data (s1 ascending, s1 descending and truth) reading 
              and preprocessing
         input: 
             ascend image, descend image and truth image paths
+            max, min: the max and min values of each band.
         return:
             scenes list and truths list
     '''
@@ -42,7 +43,7 @@ def read_normalize(paths_as, paths_des, paths_truth):
         truth, _ = readTiff(paths_truth[i])
         ## --- data normalization 
         scene = np.concatenate((ascend, descend), axis=-1)    
-        scene, truth = normalize(max=s1_max, min=s1_min)(scene, truth)
+        scene, truth = normalize(max_bands=max_bands, min_bands=min_bands)(scene, truth)
         scene = scene.transpose(2,0,1)   # channel first
         scene[np.isnan(scene)]=0         # remove nan value
         scene_list.append(scene), truth_list.append(truth)
