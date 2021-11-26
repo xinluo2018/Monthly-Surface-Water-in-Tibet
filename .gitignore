@@ -18,6 +18,7 @@ data/tibet/dem/*
 !data/tibet/dem/tibet_SRTMGL3_down.tif
 data/tibet/tibet-plateau-boundary/*
 !data/tibet/tibet-plateau-boundary/TPBoundary_HF
+data/tibet/s1_footprint/*
 
 ## pretained model
 model/pretrained/*

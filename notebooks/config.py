@@ -43,7 +43,7 @@ transforms_tra = [
         # missing_region(prob=0.2, ratio_max = 0.25),   # numpy-based
         missing_band_p(prob=0.3, ratio_max=1),    # numpy-based
         numpy2tensor(), 
-        torch_noise(prob=0.3, std_min=0, std_max=0.05),      # tensor-based
+        torch_noise(prob=0.3, std_min=0, std_max=0.1),      # tensor-based
             ]
 
 ## ---------- model training ------- ##
@@ -52,7 +52,7 @@ epoch = 200
 # lr = 0.0001
 lr = 0.001
 # lr = 0.01
-batch_size = 8
+batch_size = 32
 
 # ----- loss function
 loss_ce = nn.CrossEntropyLoss()

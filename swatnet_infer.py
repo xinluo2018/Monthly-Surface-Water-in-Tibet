@@ -28,7 +28,7 @@ from utils.geotif_io import readTiff, writeTiff
 from model.seg_model.model_scales_gate import unet_scales_gate
 
 ## default path of the pretrained watnet model
-path_swatnet_w = 'model/pretrained/model_scales_gate_weights_app_2.pth'
+path_swatnet_w = ['model/pretrained/model_scales_gate_weights_app_1.pth']
 
 s1_min = [-57.78, -70.37, -58.98, -68.47]   # as-vv, as-vh, des-vv, des-vh
 s1_max = [25.98, 10.23, 29.28, 17.60]       # as-vv, as-vh, des-vv, des-vh
@@ -76,7 +76,6 @@ def get_s1pair_nor(s1_as, s1_des):
     s1_img[np.isnan(s1_img)]=0         # remove nan value
     return s1_img
 
-
 def img2patchin(img, scales = [256, 512, 2048], overlay=60):
     ratio_mid, ratio_high = scales[1]//scales[0], scales[2]//scales[0],
     imgPat_ins = imgPatch(img=img, patch_size=scales[0], edge_overlay = overlay)
@@ -117,8 +116,8 @@ def swatnet_infer(s1_img, model):
             water_map: np.array.
     '''
 
-    ### ---- 1. Convert image to multi-scale patches ----
-    print('-- convert image to multi-scale pathes input...')
+    ### ---- 2.1. Convert image to multi-scale patches ----
+    print('-- 2.1. convert image to multi-scale pathes input...')
     patch_low_list, patch_mid_list, patch_high_list, imgPat_ins = \
                             img2patchin(s1_img, scales = [256, 512, 2048], overlay=60)
     del s1_img
@@ -139,14 +138,14 @@ def swatnet_infer(s1_img, model):
     del patch_high_list_, patch_mid_list_, patch_low_list_
     gc.collect()
 
-    ### ---- 2. prediction by pretrained model -----
-    print('-- surface water mapping using swatnet model...')
+    ### ---- 2.2. prediction by pretrained model -----
+    print('-- 2.2. surface water mapping using swatnet model...')
     pred_patch_list = model_pred(model=model, inputs=inputs)
     del inputs
     gc.collect()
 
-    ### ---- 3. Convert the patches to image ----
-    print('-- comvert patch result to image result...')
+    ### ---- 2.3. Convert the patches to image ----
+    print('-- 2.3. comvert patch result to image result...')
     pred_patch_list = [np.squeeze(patch, axis = 0).permute(1, 2, 0) for patch in pred_patch_list]
     pro_map = imgPat_ins.toImage(pred_patch_list)
     wat_map = np.where(pro_map>0.5, 1, 0)
@@ -158,7 +157,7 @@ if __name__ == '__main__':
     args = get_args()
     ifile_as = args.ifile_as
     ifile_des = args.ifile_des
-    path_model_w = args.model
+    path_model_w = args.model[0]
     odir = args.odir
     scale_DN = args.scale_DN[0]
 
@@ -199,7 +198,7 @@ if __name__ == '__main__':
         
         ### ---- 1. preprocessing
         ### ---- 1.1 data reading
-        print('--- data reading...')
+        print('--- 1. data reading...')
         print(io_files[i][0])
         print(io_files[i][1])
         s1_ascend, s1_ascend_info = readTiff(path_in = io_files[i][0])
@@ -213,13 +212,13 @@ if __name__ == '__main__':
         gc.collect()
 
         ### ---- 2. surface water mapping ----
-        print('--- surface water mapping using swatnet model...')
+        print('--- 2. surface water mapping using swatnet model...')
         wat_map = swatnet_infer(s1_img=s1_img_nor, model=model)
         del s1_img_nor
         gc.collect()
 
         ### ---- 3. write out the water map -----
-        print('--- write out the result image...')
+        print('--- 3. write out the result image...')
         writeTiff(im_data = wat_map.astype(np.uint8), 
                     im_geotrans = s1_ascend_info['geotrans'], 
                     im_geosrs = s1_ascend_info['geosrs'], 

@@ -19,7 +19,6 @@ def readTiff(path_in):
     im_bands =RS_Data.RasterCount  # 
     im_geotrans = RS_Data.GetGeoTransform()  # 
     im_proj = RS_Data.GetProjection()  # 
-    # img_array = RS_Data.ReadAsArray(0, 0, im_col, im_row).astype(np.float)  # 
     img_array = RS_Data.ReadAsArray(0, 0, im_col, im_row)  # 
     left = im_geotrans[0]
     up = im_geotrans[3]
