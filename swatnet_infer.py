@@ -28,7 +28,7 @@ from utils.geotif_io import readTiff, writeTiff
 from model.seg_model.model_scales_gate import unet_scales_gate
 
 ## default path of the pretrained watnet model
-path_swatnet_w = ['model/pretrained/model_scales_gate_weights_app_1.pth']
+path_swatnet_w = ['model/pretrained/model_gscales_app_weights_base.pth']
 
 s1_min = [-57.78, -70.37, -58.98, -68.47]   # as-vv, as-vh, des-vv, des-vh
 s1_max = [25.98, 10.23, 29.28, 17.60]       # as-vv, as-vh, des-vv, des-vh
@@ -58,7 +58,7 @@ def get_args():
 
     parser.add_argument(
         '-o', metavar='odir', dest='odir', type=str, nargs='+', 
-        default=None, help=('directory to write'))
+        default=[None], help=('directory to write'))
 
     parser.add_argument(
         '-s', metavar='scale_DN', dest='scale_DN', type=int, nargs='+', 
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     ifile_as = args.ifile_as
     ifile_des = args.ifile_des
     path_model_w = args.model[0]
-    odir = args.odir
+    odir = args.odir[0]
     scale_DN = args.scale_DN[0]
 
     ''' Obtain pair-wise ascending/descending files.'''

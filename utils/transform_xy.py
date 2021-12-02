@@ -23,7 +23,7 @@ def geo2imagexy(x, y, gdal_trans):
     '''
     des: from georeferenced location (i.e., lon, lat) to image location(col,row).
     input:
-        gdal_proj: obtained by gdal.Open() and .GetGeoTransform(), or by geotif_io.readTiff()['geotrans']
+        gdal_trans: obtained by gdal.GetGeoTransform(), or by geotif_io.readTiff()['geotrans']
         x: project or georeferenced x, i.e.,lon
         y: project or georeferenced y, i.e., lat
     return: 
@@ -38,8 +38,8 @@ def geo2imagexy(x, y, gdal_trans):
 def imagexy2geo(row, col, gdal_trans):
     '''
     input: 
-        img_gdal: GDAL data (read by gdal.Open()
         row and col are corresponding to input image (dataset)
+        gdal_trans: obtained by gdal.GetGeoTransform()
     :return:  
         geographical coordinates (left up of pixel)
     '''

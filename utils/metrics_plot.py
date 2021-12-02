@@ -22,7 +22,7 @@ def metrics_plot(metrics, keys, colors, axis_name=['Iterations', 'Accuracy'], \
        input metrics is pandas.dataframe
     '''
     if axis_range is None:
-        axis_range = [[0,metrics.shape[0]], [0, 1]]
+        axis_range = [[0, metrics.shape[0]], [0, 1]]
     if legend_name is None:
         legend_name = keys
     if y_ticks is None:

@@ -1,13 +1,14 @@
 ## author: xin luo
-## create: 2021.10.26
-## Metrics for Semantic Segmentation
+## create: 2021.10.27
+
 
 import torch
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-
-## batch-based, torch-based
+## ------------------------------ ##
+## -- batch-based; torch-based -- ##
+## ------------------------------ ##
 def oa_binary(pred, truth):
     ''' des: calculate overall accuracy (2-class classification) for each batch
         input: 
@@ -39,7 +40,9 @@ def miou_binary(pred, truth):
     return miou
 
 
-## image-based
+## ------------------------------ ##
+## --------- image-based -------- ##
+## ------------------------------ ##
 def acc_matrix(cla_map,  sam_pixel=None, truth_map=None, id_label=None):
     ''' 
     Arguments: 
@@ -71,4 +74,26 @@ def acc_matrix(cla_map,  sam_pixel=None, truth_map=None, id_label=None):
         return acc_oa, acc_prod, acc_user, confus_mat
     else:
         return acc_oa, confus_mat
+
+def acc_miou(cla_map, truth_map, labels=None):
+    '''
+    des: calculate the mean IoU metric.
+    args:
+        cla_map: classification result of the full image
+        truth_map: truth image (either truth_map or sam_pixel should be given)
+        labels: a list, the class id for calculating. e.g., [0,1,2]
+    return:
+        MIoU score
+    '''
+    iou = []
+    if labels == None:
+        labels = np.unique(truth_map)
+    for label in labels:
+        intersection = np.logical_and(cla_map==label, truth_map==label)
+        union = np.logical_or(cla_map==label, truth_map==label)
+        iou_score = np.sum(intersection)/np.sum(union)
+        iou.append(iou_score)
+    return np.mean(iou)
+
+
 

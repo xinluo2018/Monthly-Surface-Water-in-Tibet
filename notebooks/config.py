@@ -31,16 +31,15 @@ s1_max = [25.98, 10.23, 29.28, 17.60]   # as-vv, as-vh, des-vv, des-vh
 # s1_max_per = [-2.58706, -12.21354, -2.91177, -12.68447]   # as-vv, as-vh, des-vv, des-vh
 
 
-
 def missing_line_aug(prob = 0.3):    # implemented in the parallel_loader.py
     return missing_line(prob=prob)
 
 transforms_tra = [
-        # colorjitter(prob=0.3, alpha=0.1, beta=0.05),    # numpy-based, !!!beta should be small
+        colorjitter(prob=0.3, alpha=0.05, beta=0.05),    # numpy-based, !!!beta should be small
         # bandjitter(prob=0.3),     # numpy-based
         rotate(prob=0.3),         # numpy-based
         flip(prob=0.3),           # numpy-based
-        # missing_region(prob=0.2, ratio_max = 0.25),   # numpy-based
+        missing_region(prob=0.3, ratio_max = 0.2),   # numpy-based
         missing_band_p(prob=0.3, ratio_max=1),    # numpy-based
         numpy2tensor(), 
         torch_noise(prob=0.3, std_min=0, std_max=0.1),      # tensor-based
@@ -52,7 +51,7 @@ epoch = 200
 # lr = 0.0001
 lr = 0.001
 # lr = 0.01
-batch_size = 32
+batch_size = 16
 
 # ----- loss function
 loss_ce = nn.CrossEntropyLoss()

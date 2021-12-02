@@ -1,4 +1,6 @@
-## author: xin luo, creat: 2021.7.15
+## author: xin luo, 
+## creat: 2021.7.15
+## modify: 2021.11.27
 
 import fiona
 import rasterio
@@ -25,7 +27,7 @@ def raster2vec(raster_path, output_path, dn_values):
         'geometry': 'MultiPolygon',
         'properties': {'pixelvalue': 'int'}
         }
-    ## writh out vector
+    ## write out vector
     with fiona.open(output_path, 'w', 'GPKG', shp_schema, crs) as shp:
         for pixel_value in dn_values:
             polygons = [shape(geom) for geom, value in shapes
@@ -36,28 +38,36 @@ def raster2vec(raster_path, output_path, dn_values):
                 'properties': {'pixelvalue': int(pixel_value)}
             })
 
-def vec2mask(vec_path, raster_path, output_path):
+def vec2mask(path_vec, path_raster, path_save=None):
     """
     des: generate/save mask file using the vector file(e.g.,.shp,.gpkg).
-    author: jinhua zhang, create: 2021.3.13, modify: 2021.7.28
+    author: jinhua zhang, create: 2021.3.13, modify by luo: 2021.11.27
     input: 
-        vec_path, raster_path, output_path: str
+        path_vec, path_raster, path_save: str
     retrun: 
         mask, np.array.
         a .tiff file written to the given path
     """
-    raster, shp = gdal.Open(raster_path, gdal.GA_ReadOnly), ogr.Open(vec_path)
+    raster, vec = gdal.Open(path_raster, gdal.GA_ReadOnly), ogr.Open(path_vec)
     x_res = raster.RasterXSize
     y_res = raster.RasterYSize
-    layer = shp.GetLayer()
-    targetDataset = gdal.GetDriverByName('GTiff').Create(output_path, x_res, y_res, 1, gdal.GDT_Byte)
-    targetDataset.SetGeoTransform(raster.GetGeoTransform())
-    targetDataset.SetProjection(raster.GetProjection())
-    band = targetDataset.GetRasterBand(1)
+    layer = vec.GetLayer()
+    if path_save is None:
+        drv = gdal.GetDriverByName('MEM')
+        targetData = drv.Create('', x_res, y_res, 1, gdal.GDT_Byte)
+    else: 
+        driver = gdal.GetDriverByName("GTiff")
+        targetData = driver.Create(path_save, x_res, y_res, 1, gdal.GDT_Byte)
+
+    targetData.SetGeoTransform(raster.GetGeoTransform())
+    targetData.SetProjection(raster.GetProjection())
+    band = targetData.GetRasterBand(1)
     NoData_value = -9999
     band.SetNoDataValue(NoData_value)
     band.FlushCache()
-    gdal.RasterizeLayer(targetDataset, [1], layer, burn_values=[1])
-    mask = targetDataset.ReadAsArray(0, 0, x_res, y_res)
+    gdal.RasterizeLayer(targetData, [1], layer, burn_values=[1])
+    mask = targetData.ReadAsArray(0, 0, x_res, y_res)
     mask = np.where(mask>0, 1, 0)
     return mask
+
+    
