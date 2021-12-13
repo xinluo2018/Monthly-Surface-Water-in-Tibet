@@ -37,10 +37,10 @@ def missing_line_aug(prob = 0.3):    # implemented in the parallel_loader.py
 transforms_tra = [
         colorjitter(prob=0.3, alpha=0.05, beta=0.05),    # numpy-based, !!!beta should be small
         # bandjitter(prob=0.3),     # numpy-based
-        rotate(prob=0.3),         # numpy-based
-        flip(prob=0.3),           # numpy-based
-        missing_region(prob=0.3, ratio_max = 0.2),   # numpy-based
-        missing_band_p(prob=0.3, ratio_max=1),    # numpy-based
+        rotate(prob = 0.3),         # numpy-based
+        flip(prob = 0.3),           # numpy-based
+        missing_region(prob = 0.3, ratio_max = 0.2),   # numpy-based
+        missing_band_p(prob = 0.3, ratio_max = 0.5),    # numpy-based
         numpy2tensor(), 
         torch_noise(prob=0.3, std_min=0, std_max=0.1),      # tensor-based
             ]

@@ -6,7 +6,9 @@ data/dset/s1_descend/*
 data/dset/s2_img/*
 data/dset/s1_truth/*
 !data/dset/s1_truth/s1_scene_01_truth.tif
-data/dset/s1_water_test
+data/dset/s1_water_test_gscales
+data/dset/s1_water_test_scales
+data/dset/s1_water_test_single
 data/dset/s2_img/*
 # !data/dset/s2_img/scene01_s2_img.tif    # over 100M
 data/dset/val_patches

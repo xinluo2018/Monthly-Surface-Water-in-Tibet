@@ -13,7 +13,6 @@ from queue import Queue
 # s1_min = [-57.78, -70.37, -58.98, -68.47]  # as-vv, as-vh, des-vv, des-vh
 # s1_max = [25.98, 10.23, 29.28, 17.60]
 
-
 class normalize:
     '''normalization with the given per-band max and min values'''
     def __init__(self, max_bands, min_bands):
@@ -57,7 +56,7 @@ def crop(image, truth, size=(256, 256)):
         input size: (height, width)'''
     start_h = random.randint(0, truth.shape[0]-size[0])
     start_w = random.randint(0, truth.shape[1]-size[1])
-    patch = image[:,start_h:start_h+size[0], start_w:start_w+size[1]]
+    patch = image[:, start_h:start_h+size[0], start_w:start_w+size[1]]
     ptruth = truth[start_h:start_h+size[0], start_w:start_w+size[1]]
     return patch, ptruth
 

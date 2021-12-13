@@ -28,7 +28,7 @@ from utils.geotif_io import readTiff, writeTiff
 from model.seg_model.model_scales_gate import unet_scales_gate
 
 ## default path of the pretrained watnet model
-path_swatnet_w = ['model/pretrained/model_gscales_app_weights_base.pth']
+path_swatnet_w = ['model/pretrained/model_gscales_app_base_weights.pth']
 
 s1_min = [-57.78, -70.37, -58.98, -68.47]   # as-vv, as-vh, des-vv, des-vh
 s1_max = [25.98, 10.23, 29.28, 17.60]       # as-vv, as-vh, des-vv, des-vh

@@ -166,7 +166,7 @@ class missing_region:
 
 class missing_band_p:
     '''patch-based, numpy-based
-       des: randomly 2-bands (ascending/descending) missing.
+       des: randomly bands (ascending/descending) missing.
             this augmentation is due to the randomly data missing 
             in term of ascending and descending bands in tibet, respectively.'''
     def __init__(self, prob=0.5, ratio_max = 1):
@@ -181,26 +181,32 @@ class missing_band_p:
         miss_max = int(h_img*self.ratio_max)
         thre = random.random()
         if isinstance(patches, list):
+            band_miss_1 = random.randrange(patches[0].shape[0])
+            band_miss_2 = random.randrange(patches[0].shape[0])
             for i in range(len(patches)):
-                h_miss = random.randint(0, miss_max)
-                w_miss = random.randint(0, miss_max)
-                start_h = random.randint(0, h_img-h_miss)
-                start_w = random.randint(0, h_img-h_miss)
+                h_miss = random.randint(0, miss_max)       # height of the missing region
+                w_miss = random.randint(0, miss_max)       # width of the missing region
+                start_h = random.randint(0, h_img-h_miss)  # start row
+                start_w = random.randint(0, h_img-h_miss)  # start col
                 if thre > 0.5:
-                    patches_miss[i][0:2,start_h:start_h+h_miss, start_w:start_w+w_miss] = 0
+                    patches_miss[i][band_miss_1, start_h:start_h+h_miss, start_w:start_w+w_miss] = 0
+                    patches_miss[i][band_miss_2, start_h:start_h+h_miss, start_w:start_w+w_miss] = 0
                 else:
-                    patches_miss[i][2:4,start_h:start_h+h_miss, start_w:start_w+w_miss] = 0                    
+                    patches_miss[i][band_miss_1, start_h:start_h+h_miss, start_w:start_w+w_miss] = 0                    
 
         else: 
             h_miss = random.randint(0, miss_max)
             w_miss = random.randint(0, miss_max)
             start_h = random.randint(0, h_img-h_miss)
             start_w = random.randint(0, h_img-h_miss)
+            band_miss_1 = random.randrange(patches.shape[0])
+            band_miss_2 = random.randrange(patches.shape[0])
             if thre > 0.5:
-                patches_miss[0:2,start_h:start_h+h_miss, start_w:start_w+w_miss] = 0
+                patches_miss[band_miss_1, start_h:start_h+h_miss, start_w:start_w+w_miss] = 0
+                patches_miss[band_miss_2, start_h:start_h+h_miss, start_w:start_w+w_miss] = 0
             else:
-                patches_miss[2:4,start_h:start_h+h_miss, start_w:start_w+w_miss] = 0                    
-                    
+                patches_miss[band_miss_1,start_h:start_h+h_miss, start_w:start_w+w_miss] = 0                    
+            
         return patches_miss, truth
 
 class noise:
