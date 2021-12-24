@@ -16,6 +16,7 @@ class unet_scales(nn.Module):
     '''
     def __init__(self, num_bands, num_classes, scale_high=2048, scale_mid=512, scale_low=256):
         super(unet_scales, self).__init__()
+        self.name = 'unet_scales'
         self.num_classes = num_classes
         self.scale_high, self.scale_mid, self.scale_low = scale_high, scale_mid, scale_low
         self.high2low_ratio = scale_high//scale_low

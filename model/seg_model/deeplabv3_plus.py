@@ -11,7 +11,8 @@ from .helper import conv1x1_bn_relu, conv3x3_bn_relu,deconv4x4_bn_relu
 class deeplabv3plus(nn.Module):
     '''des: original deeplabv3_plus model'''
     def __init__(self, num_bands=4, num_classes=2, backbone=Xception65_feat):
-        super(deeplabv3plus, self).__init__()        
+        super(deeplabv3plus, self).__init__()
+        self.name = 'deeplabv3plus'
         self.backbone = backbone(num_bands=num_bands)
         self.aspp = aspp(in_channels=2048, atrous_rates=[12, 24, 36])
         self.low_block = conv1x1_bn_relu(128, 48)
@@ -31,7 +32,7 @@ class deeplabv3plus(nn.Module):
                     nn.Softmax(dim=1))
 
 
-    def forward(self,x):
+    def forward(self, x):
         fea_low, fea_high = self.backbone(x) 
         ## -------high-level features------- ##
         x_fea_high = self.aspp(fea_high)    # channels: -> 256

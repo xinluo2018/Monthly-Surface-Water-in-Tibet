@@ -22,7 +22,7 @@ def smooth(y, window=31, num_sam = None):
         y = x_y_spline(x)
     return x, y
 
-def metrics_merge(metrics, new_col=None, sam=None):
+def csv_merge(csv_files, new_col=None, sam=None):
     '''
     des: merge the metrics obtained by i-th testing,
         the metrics are the same size.
@@ -32,7 +32,7 @@ def metrics_merge(metrics, new_col=None, sam=None):
     return:
       metrics_model: the merged metrics
     '''
-    for i, metric in enumerate(metrics):
+    for i, metric in enumerate(csv_files):
         if isinstance(metric, str):
           metric = pd.read_csv(metric) 
         metric_proc = metric.copy()

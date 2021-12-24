@@ -1,6 +1,3 @@
-python swatnet_infer.py /myDrive/tibet-water/tibet-202001/s1_ascend/*.tif -des /myDrive/tibet-water/tibet-202001/s1_descend/*1??.tif -s 100 -m model/pretrained/model_scales_gate_app_1_weights.pth -o /myDrive/tibet-water/tibet-202001/s1_water_1
-python swatnet_infer.py /myDrive/tibet-water/tibet-202001/s1_ascend/*.tif -des /myDrive/tibet-water/tibet-202001/s1_descend/*2??.tif -s 100 -m model/pretrained/model_scales_gate_app_1_weights.pth -o /myDrive/tibet-water/tibet-202001/s1_water_1
-python swatnet_infer.py /myDrive/tibet-water/tibet-202001/s1_ascend/*.tif -des /myDrive/tibet-water/tibet-202001/s1_descend/*3??.tif -s 100 -m model/pretrained/model_scales_gate_app_1_weights.pth -o /myDrive/tibet-water/tibet-202001/s1_water_1
-python swatnet_infer.py /myDrive/tibet-water/tibet-202001/s1_ascend/*.tif -des /myDrive/tibet-water/tibet-202001/s1_descend/*08?.tif -s 100 -m model/pretrained/model_scales_gate_app_1_weights.pth -o /myDrive/tibet-water/tibet-202001/s1_water_1
-python swatnet_infer.py /myDrive/tibet-water/tibet-202001/s1_ascend/*.tif -des /myDrive/tibet-water/tibet-202001/s1_descend/*09?.tif -s 100 -m model/pretrained/model_scales_gate_app_1_weights.pth -o /myDrive/tibet-water/tibet-202001/s1_water_1
+python swatnet_infer.py -as /myDrive/tibet-water/tibet-202002/s1_ascend/*.tif -des /myDrive/tibet-water/tibet-202002/s1_descend/*.tif -s 100
+
 

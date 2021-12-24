@@ -301,7 +301,6 @@ class bandjitter:
         return patches_aug, truth
 
 
-
 class torch_rotate:
     '''patch-based, torch-based
        des: randomly rotation with given probability
