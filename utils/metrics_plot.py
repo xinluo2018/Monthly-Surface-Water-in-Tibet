@@ -22,13 +22,14 @@ def smooth(y, window=31, num_sam = None):
         y = x_y_spline(x)
     return x, y
 
-def csv_merge(csv_files, new_col=None, sam=None):
+def csv_merge(csv_files, i_csv = None, i_row=None, sam=None):
     '''
     des: merge the metrics obtained by i-th testing,
         the metrics are the same size.
     args:
       metric: .csv file path or pandas.dataframe data. (the data are with column name).
-      new_col, str, the name of the new created column.
+      i_csv: str, the name of the new created column corresponding csv file id.
+      i_row: str, the name of the new created column corresponding row id of the csv file.
     return:
       metrics_model: the merged metrics
     '''
@@ -38,10 +39,10 @@ def csv_merge(csv_files, new_col=None, sam=None):
         metric_proc = metric.copy()
         if sam:
           metric_proc = metric_proc[::sam]     # down-sampling
-        if 'epoch' not in metric_proc.columns:
-          metric_proc['epoch'] = metric_proc.index+1
-        if new_col is not None:
-          metric_proc[new_col] = np.ones_like(metric_proc.index) + i
+        if i_row is not None:
+          metric_proc[i_row] = metric_proc.index+1
+        if i_csv is not None:
+          metric_proc[i_csv] = np.ones_like(metric_proc.index) + i
         if i == 0:
           metrics_merge = metric_proc   # initial metrics_model
         else:

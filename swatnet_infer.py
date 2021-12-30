@@ -230,7 +230,7 @@ if __name__ == '__main__':
             idx_as_valid_only = [i for i in range(num_patch)]
             idx_des_valid_only = idx_both_valid = []
         ### below: both ascending and descending image exist
-        elif dif_as_des > 0.05:    
+        elif dif_as_des > 0.05:    ### difference threshold > 0.05
             miss_as_per = [1 - np.count_nonzero(patch[:,:,0:2])/patch[:,:,0:2].size for patch in patch_low_list]
             miss_des_per = [1 - np.count_nonzero(patch[:,:,2:4])/patch[:,:,2:4].size for patch in patch_low_list]
             idx_all = np.arange(len(patch_low_list))

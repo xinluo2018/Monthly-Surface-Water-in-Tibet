@@ -48,10 +48,9 @@ transforms_tra = [
 ## ---------- model training ------- ##
 # ----- parameter setting
 epoch = 200
-# lr = 0.0001
-lr = 0.001
+lr = 0.001  # select
 # lr = 0.01
-batch_size = 16
+batch_size = 16  # select
 
 # ----- loss function
 loss_ce = nn.CrossEntropyLoss()
