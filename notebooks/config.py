@@ -35,6 +35,7 @@ def missing_line_aug(prob = 0.3):    # implemented in the parallel_loader.py
     return missing_line(prob=prob)
 
 transforms_tra = [
+        ### !!!note: line missing in the paraller_loader.py
         colorjitter(prob=0.3, alpha=0.05, beta=0.05),    # numpy-based, !!!beta should be small
         # bandjitter(prob=0.3),     # numpy-based
         rotate(prob = 0.3),         # numpy-based

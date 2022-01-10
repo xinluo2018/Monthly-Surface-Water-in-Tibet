@@ -24,8 +24,7 @@ def smooth(y, window=31, num_sam = None):
 
 def csv_merge(csv_files, i_csv = None, i_row=None, sam=None):
     '''
-    des: merge the metrics obtained by i-th testing,
-        the metrics are the same size.
+    des: merge the csv file along the column, the metrics should be the same size.
     args:
       metric: .csv file path or pandas.dataframe data. (the data are with column name).
       i_csv: str, the name of the new created column corresponding csv file id.
