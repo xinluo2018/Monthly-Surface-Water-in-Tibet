@@ -28,6 +28,7 @@ def imgShow(img, extent=None, color_bands=(2,1,0), \
         row,col = img.shape
     elif len(img.shape) == 3:
         row,col,_ = img.shape
+    row_start = None
     if focus_pix:  # obtain focused image
         row_start, row_end, col_start, col_end = focus_pix
         img = img[row_start:row_end, col_start:col_end]  
@@ -36,7 +37,6 @@ def imgShow(img, extent=None, color_bands=(2,1,0), \
         row_start, row_end = int(row*row_start_percent), int(row*row_end_percent)
         col_start, col_end = int(col*col_start_percent), int(col*col_end_percent)
         img = img[row_start:row_end, col_start:col_end]
-
     if extent and row_start:    # update the extent
         x_extent, y_extent = extent[1]-extent[0], extent[3]-extent[2]
         extent_x_min = (col_start/col)*x_extent + extent[0]

@@ -23,7 +23,6 @@ dir_truth = root_proj + '/data/dset/s1_truth'
 # --- patch dir for validation ---
 dir_patch_val = root_proj + '/data/dset/val_patches'
 
-
 ## --------- data loader -------- ##
 s1_min = [-57.78, -70.37, -58.98, -68.47]  # as-vv, as-vh, des-vv, des-vh
 s1_max = [25.98, 10.23, 29.28, 17.60]   # as-vv, as-vh, des-vv, des-vh

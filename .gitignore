@@ -5,7 +5,7 @@ data/dset/s1_descend/*
 # !data/dset/s1_descend/s1des_scene01.tif
 data/dset/s2_img/*
 data/dset/s1_truth/*
-!data/dset/s1_truth/scene01_wat_truth.tif
+# !data/dset/s1_truth/scene01_wat_truth.tif
 data/dset/s1_water_test_gscales
 data/dset/s1_water_test_scales
 data/dset/s1_water_test_single
@@ -19,10 +19,10 @@ data/dset/metrics_as_des_in/*
 
 ## data/tibet
 data/tibet/dem/*
-# !data/tibet/dem/tibet_SRTMGL3_down.tif
 data/tibet/tibet-plateau-boundary/*
 !data/tibet/tibet-plateau-boundary/TPBoundary_HF
 data/tibet/s1_footprint/*
+data/tibet/jrc_water/*30m*
 
 ## pretained model
 model/pretrained/*

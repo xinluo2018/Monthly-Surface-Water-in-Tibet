@@ -1,4 +1,6 @@
-## author: luo xin, creat: 2021.6.18, modify: 2021.7.14
+## author: xin luo 
+# creat: 2021.6.18
+# modify: 2022.1.25
 
 import numpy as np
 from osgeo import gdal
@@ -57,7 +59,7 @@ def writeTiff(im_data, im_geotrans, im_geosrs, path_out):
     else:
         im_bands,(im_height, im_width) = 1,im_data.shape
     driver = gdal.GetDriverByName("GTiff")
-    dataset = driver.Create(path_out, im_width, im_height, im_bands, datatype)
+    dataset = driver.Create(path_out, im_width, im_height, im_bands, datatype, options=["TILED=YES", "COMPRESS=LZW"])
     if(dataset!= None):
         dataset.SetGeoTransform(im_geotrans)       # 
         dataset.SetProjection("EPSG:" + str(im_geosrs))      # 
