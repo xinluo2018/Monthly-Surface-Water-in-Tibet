@@ -8,8 +8,8 @@ do
     echo 'Run the images mosaic'
     echo 'Basic usage: mosaic.sh -i Path_in -o Path_out'
     echo '-i Paths_in   :  paths of the images to be mosaicked, the wildcard is allowed; if 
-                        Path_in contains wildcard or multiple files, the multiple files 
-                        should be put in " " ' 
+                           Path_in contains wildcard or multiple files, the multiple files 
+                           should be put in " " ' 
     echo '-o Path_out  :  paths of the out mosaicked image'
     exit 0
     ;;
@@ -40,7 +40,7 @@ do
     echo 'mosaic image ->:' $path_in
     gdal_merge.py -o $path_out $path_in $path_in -init 0 -co COMPRESS=LZW
   else
-    mv $path_out $path_out_tmp   # rename
+    mv $path_out $path_out_tmp    # rename
     echo 'mosaic image ->:' $path_in
     gdal_merge.py -o $path_out $path_out_tmp $path_in -init 0 -co COMPRESS=LZW
   fi

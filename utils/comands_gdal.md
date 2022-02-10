@@ -1,5 +1,7 @@
 #! /bin/bath
 ## des: some example for fast processing of the remote sensing image.
+## main gdal tools: gdal_translate, gdal_merge.py, gdalwarp(for reprojection)...
+
 
 ##### shell style
 ### ------ downsampling ------ 
@@ -18,7 +20,7 @@ gdal_translate -projwin -co COMPRESS=LZW $extent $path_in $path_out
 ##### python style
 ```python
 import os
-## extent: str(ulx) str(uly) str(lrx) str(lry)
+## extent: 'str(ulx) str(uly) str(lrx) str(lry)'
 command = 'gdal_translate -projwin ' + extent +' -co COMPRESS=LZW ' + path_wat + ' ' + path_wat_subs
 print(os.popen(command).read())
 ```

@@ -5,7 +5,6 @@ data/dset/s1_descend/*
 # !data/dset/s1_descend/s1des_scene01.tif
 data/dset/s2_img/*
 data/dset/s1_truth/*
-# !data/dset/s1_truth/scene01_wat_truth.tif
 data/dset/s1_water_test_gscales
 data/dset/s1_water_test_scales
 data/dset/s1_water_test_single
