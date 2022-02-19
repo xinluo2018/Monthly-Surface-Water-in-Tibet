@@ -25,6 +25,7 @@ data/tibet/jrc_water/*30m*
 
 ## pretained model
 model/pretrained/*
+model/pretrained-deprecated
 !model/pretrained/model_scales_gate_001_weights.pth
 
 ## the other

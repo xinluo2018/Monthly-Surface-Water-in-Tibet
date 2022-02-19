@@ -11,7 +11,7 @@ from dataloader.img_aug import colorjitter, bandjitter
 
 ## ------------- Path -------------- ##
 # -------- root directory --------  #
-root_tb_data = '/myDrive/tibet-water'
+root_tb_data = '/WD-myBook/tibet-water'
 root_proj = "/home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet"
 
 # ------------ data directory -------------- #
@@ -20,27 +20,30 @@ dir_as = root_proj + '/data/dset/s1_ascend'
 dir_des = root_proj + '/data/dset/s1_descend'
 dir_truth = root_proj + '/data/dset/s1_truth'
 
+## -------- train/validation data spliting --------
+val_ids = [0,2,7,10,14,18,23,31,35]
+tra_ids = list(set([i for i in range(37)])-set((val_ids)))
+
 # --- patch dir for validation ---
 dir_patch_val = root_proj + '/data/dset/val_patches'
 
 ## --------- data loader -------- ##
-s1_min = [-63.00, -70.37, -58.98, -69.94]  # as-vv, as-vh, des-vv, des-vh
+s1_min = [-63.00, -70.37, -59.01, -69.94]  # as-vv, as-vh, des-vv, des-vh
 s1_max = [30.61, 13.71, 29.28, 17.60]   # as-vv, as-vh, des-vv, des-vh
 
-def missing_line_aug(prob = 0.3):    # implemented in the parallel_loader.py
+def missing_line_aug(prob = 0.2):    # implemented in the parallel_loader.py
     return missing_line(prob=prob)
 
 transforms_tra = [
         ### !!!note: line missing in the paraller_loader.py
-        colorjitter(prob=0.5, alpha=0.1, beta=0.1),    # numpy-based, !!!beta should be small
-        # colorjitter(prob=0.5, alpha=0.05, beta=0.05),    # numpy-based, !!!beta should be small
+        colorjitter(prob=0.2, alpha=0.05, beta=0.05),    # numpy-based, !!!beta should be small
         # bandjitter(prob=0.3),     # numpy-based
-        rotate(prob = 0.5),         # numpy-based
-        flip(prob = 0.5),           # numpy-based
-        missing_region(prob = 0.5, ratio_max = 0.3),   # numpy-based
-        missing_band_p(prob = 0.5, ratio_max = 0.3),    # numpy-based
+        rotate(prob = 0.2),         # numpy-based
+        flip(prob = 0.2),           # numpy-based
+        missing_region(prob = 0.2, ratio_max = 0.2),   # numpy-based
+        missing_band_p(prob = 0.2, ratio_max = 0.2),    # numpy-based
         numpy2tensor(), 
-        torch_noise(prob=0.5, std_min=0, std_max=0.1),      # tensor-based
+        torch_noise(prob=0.4, std_min=0, std_max=0.1),      # tensor-based
             ]
 
 ## ---------- model training ------- ##

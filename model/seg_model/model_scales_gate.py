@@ -179,3 +179,4 @@ class unet_scales_gate(nn.Module):
         output = self.up_last(x_decode)
         out_prob = self.outp_layer(output)
         return out_prob, gates_mid, gates_high
+
