@@ -48,9 +48,10 @@ transforms_tra = [
 
 ## ---------- model training ------- ##
 # ----- parameter setting
-epoch = 300
-lr = 0.0005  # select
-# lr = 0.01
+# epoch = 300  # select
+# lr = 0.0005  # select
+epoch = 100  # tmp
+lr = 0.00001  # tmp
 batch_size = 16  # select
 
 # ----- loss function
