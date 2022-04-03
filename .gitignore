@@ -1,30 +1,14 @@
 ## data/dset
-data/dset/s1_ascend/*
-# !data/dset/s1_ascend/s1as_scene01.tif
-data/dset/s1_descend/*
-# !data/dset/s1_descend/s1des_scene01.tif
-data/dset/s2_img/*
-data/dset/s1_truth/*
-data/dset/s1_water_test_gscales
-data/dset/s1_water_test_scales
-data/dset/s1_water_test_single
-data/dset/s1_water_test_as
-data/dset/s1_water_test_des
-data/dset/s2_img/*
-# !data/dset/s2_img/scene01_s2_img.tif    # over 100M
-data/dset/val_patches
-data/dset/s1_as_des/*
-data/dset/metrics_as_des_in/*
+data/dset
 
 ## data/tibet
-data/tibet/dem/*
-data/tibet/tibet-plateau-boundary/*
-!data/tibet/tibet-plateau-boundary/TPBoundary_HF
-data/tibet/s1_footprint/*
-data/tibet/jrc_water/*30m*
+data/tibet/
+
+## figure
+figure/
 
 ## pretained model
-model/pretrained/*
+model/pretrained_model/*
 model/pretrained-deprecated
 !model/pretrained/model_scales_gate_001_weights.pth
 

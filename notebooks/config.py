@@ -1,5 +1,5 @@
 ## author: xin luo, 
-## created: 2021.7.8
+## created: 2021.7.8, modify: xxxx
 ## modify: 2021.10.13
 
 import torch
@@ -21,8 +21,8 @@ dir_des = root_proj + '/data/dset/s1_descend'
 dir_truth = root_proj + '/data/dset/s1_truth'
 
 ## -------- train/validation data spliting --------
-val_ids = [0,2,7,10,14,18,23,31,35]
-tra_ids = list(set([i for i in range(37)])-set((val_ids)))
+val_ids = [0,2,7,10,14,18,23,31,35,38]
+tra_ids = list(set([i for i in range(39)])-set((val_ids)))
 
 # --- patch dir for validation ---
 dir_patch_val = root_proj + '/data/dset/val_patches'
@@ -35,7 +35,7 @@ def missing_line_aug(prob = 0.2):    # implemented in the parallel_loader.py
     return missing_line(prob=prob)
 
 transforms_tra = [
-        ### !!!note: line missing in the paraller_loader.py
+        ### !!!note: line missing is in the paraller_loader.py
         colorjitter(prob=0.2, alpha=0.05, beta=0.05),    # numpy-based, !!!beta should be small
         # bandjitter(prob=0.3),     # numpy-based
         rotate(prob = 0.2),         # numpy-based
@@ -48,15 +48,15 @@ transforms_tra = [
 
 ## ---------- model training ------- ##
 # ----- parameter setting
-# epoch = 300  # select
-# lr = 0.0005  # select
-epoch = 100  # tmp
-lr = 0.00001  # tmp
+epoch = 300  # select
+lr = 0.0002  # select
+# epoch = 5  # tmp
+# lr = 0.00001  # tmp
 batch_size = 16  # select
 
 # ----- loss function
-loss_ce = nn.CrossEntropyLoss()
-loss_bce = nn.BCELoss()
+loss_ce = nn.CrossEntropyLoss()  
+loss_bce = nn.BCELoss()    # selected
 loss_focal = FocalLoss()
 
 # ----- label_smooth

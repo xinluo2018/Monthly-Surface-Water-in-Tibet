@@ -178,5 +178,5 @@ class unet_scales_gate(nn.Module):
                                                             skip_high2low*gates_high[i+1]], dim=1)
         output = self.up_last(x_decode)
         out_prob = self.outp_layer(output)
-        return out_prob, gates_mid, gates_high
-
+        # return out_prob, gates_mid, gates_high
+        return out_prob
