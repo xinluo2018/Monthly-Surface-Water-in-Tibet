@@ -8,9 +8,7 @@ data/tibet/
 figure/
 
 ## pretained model
-model/pretrained_model/*
-model/pretrained-deprecated
-!model/pretrained/model_scales_gate_001_weights.pth
+model/trained_model/*
 
 ## the other
 .venv

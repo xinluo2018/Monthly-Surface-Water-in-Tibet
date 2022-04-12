@@ -1,10 +1,14 @@
 #!/bin/bash
+## author: xin luo
+
+cd /home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet
 
 ## ----- 1. Configure models
 ## surface water mapping using deep learning models
-model=/home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet/model/pretrained/apply_to_tibet/gscales_app_base_weights.pth
-model_as=/home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet/model/pretrained/apply_to_tibet/gscales_app_as_base_weights.pth
-model_des=/home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet/model/pretrained/apply_to_tibet/gscales_app_des_base_weights.pth
+model=model/pretrained/apply_to_tibet/gscales_app_base_weights.pth
+model_as=model/pretrained/apply_to_tibet/gscales_app_as_base_weights.pth
+model_des=model/pretrained/apply_to_tibet/gscales_app_des_base_weights.pth
+
 
 
 ## ----- 2. Configure data

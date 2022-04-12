@@ -21,15 +21,15 @@ dir_des = root_proj + '/data/dset/s1_descend'
 dir_truth = root_proj + '/data/dset/s1_truth'
 
 ## -------- train/validation data spliting --------
-val_ids = [0,2,7,10,14,18,23,31,35,38]
+val_ids = [0,2,7,10,14,18,23,31,35,38]   ## !!!note: the scene id is start with 1 in our dataset.
 tra_ids = list(set([i for i in range(39)])-set((val_ids)))
 
 # --- patch dir for validation ---
-dir_patch_val = root_proj + '/data/dset/val_patches'
+dir_patch_val = root_proj + '/data/dset/s1_val_patches'
 
 ## --------- data loader -------- ##
 s1_min = [-63.00, -70.37, -59.01, -69.94]  # as-vv, as-vh, des-vv, des-vh
-s1_max = [30.61, 13.71, 29.28, 17.60]   # as-vv, as-vh, des-vv, des-vh
+s1_max = [30.61, 13.71, 29.28, 17.60]      # as-vv, as-vh, des-vv, des-vh
 
 def missing_line_aug(prob = 0.2):    # implemented in the parallel_loader.py
     return missing_line(prob=prob)
@@ -48,7 +48,7 @@ transforms_tra = [
 
 ## ---------- model training ------- ##
 # ----- parameter setting
-epoch = 300  # select
+epoch = 500  # select
 lr = 0.0002  # select
 # epoch = 5  # tmp
 # lr = 0.00001  # tmp
