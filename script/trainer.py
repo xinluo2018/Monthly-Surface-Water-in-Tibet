@@ -1,5 +1,5 @@
 ## author: xin luo
-## creat: 2022.4.3, modify: xxxx
+## creat: 2022.4.3, modify: 2022.4.15
 ## des: model traing with the dset(traset or full dset)
 ## !!!note: the input dataset not to be normalized. the normalization process has been 
 ##          added to this script.
@@ -149,26 +149,40 @@ if __name__ == '__main__':
     print('Model type and name:', model_type + '/' + dataset + '/' + s1_orbit + '/' + model_name)
 
     ## Data paths 
+    ### the whole dataset.
     paths_as = sorted(glob.glob(config.dir_as + '/*pad*.tif'))  ## ascending scenes
     paths_des = sorted(glob.glob(config.dir_des+'/*pad*.tif'))  ## descending scenes
     paths_truth = sorted(glob.glob(config.dir_truth+'/*pad*.tif'))   ## truth water 
+    ### training part of the dataset.
+    paths_tra_as, paths_tra_des, paths_tra_truth = [], [], []
+    for val_id in config.tra_ids:   ## select training scenes
+      as_name = 'scene'+val_id+'_s1as_pad.tif'
+      des_name = 'scene'+val_id+'_s1des_pad.tif'
+      truth_name = 'scene'+val_id+'_wat_truth_pad.tif'
+      paths_tra_as.append(config.dir_as + '/' + as_name); 
+      paths_tra_des.append(config.dir_des + '/' + des_name);
+      paths_tra_truth.append(config.dir_truth + '/' + truth_name)
+    ### validation part of the dataset (patch format)
     paths_patch_val = sorted(glob.glob(config.dir_patch_val+'/*'))   ## validatation patches
 
     '''--------- 1. Data loading --------'''
+    if dataset == 'traset':   ## use the training scenes for training.
+      paths_as_, paths_des_, paths_truth_ = paths_tra_as, paths_tra_des, paths_tra_truth
+    else:                     ## use the whole scenes for training.
+      paths_as_, paths_des_, paths_truth_ = paths_as, paths_des, paths_truth
+
     '''----- 1.1 training data loading (from scenes path) '''
-    tra_scenes, tra_truths = read_normalize(paths_as=paths_as, paths_des=paths_des, \
-                                paths_truth=paths_truth, max_bands=config.s1_max, min_bands=config.s1_min)
+    tra_scenes, tra_truths = read_normalize(paths_as=paths_as_, paths_des=paths_des_, \
+                                paths_truth=paths_truth_, max_bands=config.s1_max, min_bands=config.s1_min)
     # ### !!!!extract either ascending or descending image.
     tra_scenes = [s[id_band_start: id_band_end] for s in tra_scenes]   ## [0:2] -> ascending; [2:4] -> descending
     ''' ----- 1.2. Training data loading and auto augmentation'''
-    if dataset == 'traset':   ## select the training scenes
-      tra_scenes = [tra_scenes[id] for id in config.tra_ids]    
-      tra_truths = [tra_truths[id] for id in config.tra_ids]
     tra_dset = threads_scene_dset(scene_list = tra_scenes, \
                                   truth_list = tra_truths, 
                                   transforms=config.transforms_tra, 
                                   num_thread=30)       ##  num_thread(30) patches per scene.
-    print('size of training data:', tra_dset.__len__())
+    print('size of training data:  ', tra_dset.__len__())
+
     ''' ----- 1.3. validation data loading (validation patches) ------ '''
     patch_list_val = [torch.load(path) for path in paths_patch_val]
     ## !!!extract either ascending or descending image for validation
@@ -177,7 +191,7 @@ if __name__ == '__main__':
        for j in range(len(patch_list_val[0][0])):
           patch_list_val[i][0][j] = patch_list_val[i][0][j][id_band_start:id_band_end]   
     val_dset = patch_tensor_dset(patch_pair_list = patch_list_val)
-    print('size of val data:', val_dset.__len__())
+    print('size of validation data:', val_dset.__len__())
 
     tra_loader = torch.utils.data.DataLoader(tra_dset, batch_size=config.batch_size, shuffle=True)
     val_loader = torch.utils.data.DataLoader(val_dset, batch_size=16)

@@ -21,8 +21,14 @@ dir_des = root_proj + '/data/dset/s1_descend'
 dir_truth = root_proj + '/data/dset/s1_truth'
 
 ## -------- train/validation data spliting --------
-val_ids = [0,2,7,10,14,18,23,31,35,38]   ## !!!note: the scene id is start with 1 in our dataset.
-tra_ids = list(set([i for i in range(39)])-set((val_ids)))
+# val_ids = [0,2,7,10,14,18,23,31,35,38]   ## !!!note: the scene id is start with 1 in our dataset.
+# tra_ids = list(set([i for i in range(39)])-set((val_ids)))
+
+val_ids = ['03','05','08','11','15','19','24','31','37','39']
+tra_ids= ['01','02','04','06','07','09','10','12','13','14','16',
+          '17','18','20','21','22','23','25','26','27','28','29',
+          '30','32','33','34','35','36','38']
+
 
 # --- patch dir for validation ---
 dir_patch_val = root_proj + '/data/dset/s1_val_patches'
@@ -36,19 +42,19 @@ def missing_line_aug(prob = 0.2):    # implemented in the parallel_loader.py
 
 transforms_tra = [
         ### !!!note: line missing is in the paraller_loader.py
-        colorjitter(prob=0.2, alpha=0.05, beta=0.05),    # numpy-based, !!!beta should be small
+        colorjitter(prob=0.25, alpha=0.05, beta=0.05),    # numpy-based, !!!beta should be small
         # bandjitter(prob=0.3),     # numpy-based
-        rotate(prob = 0.2),         # numpy-based
-        flip(prob = 0.2),           # numpy-based
-        missing_region(prob = 0.2, ratio_max = 0.2),   # numpy-based
-        missing_band_p(prob = 0.2, ratio_max = 0.2),    # numpy-based
+        rotate(prob = 0.25),         # numpy-based
+        flip(prob = 0.25),           # numpy-based
+        missing_region(prob = 0.25, ratio_max = 0.2),   # numpy-based
+        missing_band_p(prob = 0.25, ratio_max = 0.2),    # numpy-based
         numpy2tensor(), 
-        torch_noise(prob=0.4, std_min=0, std_max=0.1),      # tensor-based
+        torch_noise(prob=0.25, std_min=0, std_max=0.1),      # tensor-based
             ]
 
 ## ---------- model training ------- ##
 # ----- parameter setting
-epoch = 500  # select
+epoch = 300  # select
 lr = 0.0002  # select
 # epoch = 5  # tmp
 # lr = 0.00001  # tmp
