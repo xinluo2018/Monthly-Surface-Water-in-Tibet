@@ -1,25 +1,31 @@
 #!/bin/bash
-## create: 2022.4.9
+## author: xin luo
+## create: 2022.4.9; modify: 2022.4.20
 ## des: surface water inference and accurace evaluation for the test sites by using 
-##      1) the trained gscales, scales, and single-scale models. 
-##      2) the trained ascending only-based and descending only-based gscales models.
+##      1) the trained gscales vs. scales vs. single-scale models. 
+##      2) the ascending only-based vs. descending only-based vs. combined ascending \
+##         and descending gscales models.
+
 
 cd /home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet
 
-# IDS_MODEL='1 2 3 4 5 6 7 8 9 10'
-IDS_MODEL='1'
+IDS_MODEL='0 1 2 3 4 5 6 7 8 9'
+# IDS_MODEL='1'
+
 
 for ID_MODEL in $IDS_MODEL
 
 do 
   ## ----- 1. Configure models
   ## surface water mapping using deep learning models
+  echo 'Model ID: ' $ID_MODEL
   model_gscales_as=model/trained_model/gscales/traset/as/model_${ID_MODEL}_weights.pth
   model_gscales_des=model/trained_model/gscales/traset/des/model_${ID_MODEL}_weights.pth
   model_gscales=model/trained_model/gscales/traset/as_des/model_${ID_MODEL}_weights.pth
   model_scales=model/trained_model/scales/traset/as_des/model_${ID_MODEL}_weights.pth
   model_single=model/trained_model/single/traset/as_des/model_${ID_MODEL}_weights.pth
-  VALSITES='01 03 08 11 15 19 24 32 36 39'
+
+  VALSITES='03 06 08 11 15 19 24 31 37 39'
 
   for I_VAL in $VALSITES
   do
@@ -50,4 +56,3 @@ do
   done
 
 done
-

@@ -16,19 +16,16 @@ root_proj = "/home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet"
 
 # ------------ data directory -------------- #
 # --- scene dir path for training ---
-dir_as = root_proj + '/data/dset/s1_ascend'
-dir_des = root_proj + '/data/dset/s1_descend'
-dir_truth = root_proj + '/data/dset/s1_truth'
+dir_as = root_proj + '/data/dset/s1_ascend_clean'
+dir_des = root_proj + '/data/dset/s1_descend_clean'
+dir_truth = root_proj + '/data/dset/s1_truth_clean'
 
 ## -------- train/validation data spliting --------
-# val_ids = [0,2,7,10,14,18,23,31,35,38]   ## !!!note: the scene id is start with 1 in our dataset.
-# tra_ids = list(set([i for i in range(39)])-set((val_ids)))
 
-val_ids = ['03','05','08','11','15','19','24','31','37','39']
-tra_ids= ['01','02','04','06','07','09','10','12','13','14','16',
+val_ids = ['03','06','08','11','15','19','24','31','39']
+tra_ids= ['01','02','04','05','07','09','10','12','13','14','16',
           '17','18','20','21','22','23','25','26','27','28','29',
-          '30','32','33','34','35','36','38']
-
+          '30','32','33','34','35','36','37','38']
 
 # --- patch dir for validation ---
 dir_patch_val = root_proj + '/data/dset/s1_val_patches'
