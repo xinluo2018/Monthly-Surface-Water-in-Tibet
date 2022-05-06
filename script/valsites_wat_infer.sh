@@ -9,9 +9,8 @@
 
 cd /home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet
 
-IDS_MODEL='0 1 2 3 4 5 6 7 8 9'
-# IDS_MODEL='1'
-
+# IDS_MODEL='0 1 2 3 4 5 6 7 8 9'
+IDS_MODEL='6'
 
 for ID_MODEL in $IDS_MODEL
 

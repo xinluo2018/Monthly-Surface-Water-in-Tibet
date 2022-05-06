@@ -167,8 +167,9 @@ class missing_region:
 class missing_band_p:
     '''patch-based, numpy-based
        des: randomly bands (ascending/descending) missing.
-            this augmentation is due to the randomly data missing 
-            in term of ascending and descending bands in tibet, respectively.'''
+            this augmentation is the randomly ascending and \
+            descending bands missing, respectively.'''
+            
     def __init__(self, prob=0.5, ratio_max = 1):
         self.p = prob
         self.ratio_max = ratio_max

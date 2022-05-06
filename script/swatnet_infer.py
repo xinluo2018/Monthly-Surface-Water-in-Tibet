@@ -153,7 +153,7 @@ if __name__ == '__main__':
     if not os.path.exists(dir_wat):
         os.makedirs(dir_wat)
 
-    ### pair-wise input ascend and descend s1 images
+    ### pair-wise ascend and descend s1 input images
     # ### TODO: should be simplified    
     if ifile_as[0] and ifile_des[0] is not None:
         for id, i_as in enumerate(ifile_as):   

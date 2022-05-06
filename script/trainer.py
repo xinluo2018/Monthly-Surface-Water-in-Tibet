@@ -46,6 +46,12 @@ def get_args():
             help='model name of the trained model, e.g., model_1',
             default=['model_1']
             )
+    parser.add_argument(
+            '--num_epoch', type=int, nargs='+',
+            help='number of the training epoch, e.g., 300',
+            default=[300]
+            )
+
     return parser.parse_args()
 
 
@@ -71,7 +77,7 @@ def val_step(model, loss_fn, x, y):
     return loss, miou, oa
 
 '''------ train loops ------'''
-def train_loops(model, loss_fn, optimizer, tra_loader, val_loader, epoches, lr_scheduler):
+def train_loops(model, loss_fn, optimizer, tra_loader, val_loader, epoches, lr_scheduler=None):
     size_tra_loader = len(tra_loader)
     size_val_loader = len(val_loader)
     tra_loss_loops, tra_miou_loops = [], []
@@ -87,14 +93,15 @@ def train_loops(model, loss_fn, optimizer, tra_loader, val_loader, epoches, lr_s
             x_batch, y_batch = [batch.to(device) for batch in x_batch], y_batch.to(device)
             if model.name == 'deeplabv3plus':
               x_batch = x_batch[2]      # !!!note: x_batch[2] for single-scale model
-            y_batch = config.label_smooth(y_batch)
+            # y_batch = config.label_smooth(y_batch) 
             loss, miou, oa = train_step(model=model, loss_fn=loss_fn, 
                                         optimizer=optimizer, x=x_batch, y=y_batch)
             tra_loss += loss.item()
             tra_miou += miou.item()
             tra_oa += oa.item()
-        lr_scheduler.step(tra_loss)         # dynamic adjust learning rate using ReduceLROnPlateau
-        # lr_scheduler.step()                 # dynamic adjust learning rate using StepLR
+        if lr_scheduler:
+          lr_scheduler.step(tra_loss)         # if using ReduceLROnPlateau
+          # lr_scheduler.step()          # if using StepLR scheduler.
 
         '''----- 2. validate the model -----'''
         for x_batch, y_batch in val_loader:
@@ -132,6 +139,7 @@ if __name__ == '__main__':
     dataset = args.dataset[0]
     s1_orbit = args.s1_orbit[0]
     model_name = args.model_name[0]
+    num_epoch = args.num_epoch[0]
 
     device = torch.device('cuda:1')
     torch.manual_seed(999)   # make the trianing replicable
@@ -155,10 +163,10 @@ if __name__ == '__main__':
     paths_truth = sorted(glob.glob(config.dir_truth+'/*pad*.tif'))   ## truth water 
     ### training part of the dataset.
     paths_tra_as, paths_tra_des, paths_tra_truth = [], [], []
-    for val_id in config.tra_ids:   ## select training scenes
-      as_name = 'scene'+val_id+'_s1as_pad.tif'
-      des_name = 'scene'+val_id+'_s1des_pad.tif'
-      truth_name = 'scene'+val_id+'_wat_truth_pad.tif'
+    for tra_id in config.tra_ids:     ## select training scenes
+      as_name = 'scene'+tra_id+'_s1as_pad.tif'
+      des_name = 'scene'+tra_id+'_s1des_pad.tif'
+      truth_name = 'scene'+tra_id+'_wat_truth_pad.tif'
       paths_tra_as.append(config.dir_as + '/' + as_name); 
       paths_tra_des.append(config.dir_des + '/' + des_name);
       paths_tra_truth.append(config.dir_truth + '/' + truth_name)
@@ -168,7 +176,7 @@ if __name__ == '__main__':
     '''--------- 1. Data loading --------'''
     if dataset == 'traset':   ## use the training scenes for training.
       paths_as_, paths_des_, paths_truth_ = paths_tra_as, paths_tra_des, paths_tra_truth
-    else:                     ## use the whole scenes for training.
+    elif dataset == 'dset':                     ## use the whole scenes for training.
       paths_as_, paths_des_, paths_truth_ = paths_as, paths_des, paths_truth
 
     '''----- 1.1 training data loading (from scenes path) '''
@@ -180,7 +188,7 @@ if __name__ == '__main__':
     tra_dset = threads_scene_dset(scene_list = tra_scenes, \
                                   truth_list = tra_truths, 
                                   transforms=config.transforms_tra, 
-                                  num_thread=30)       ##  num_thread(30) patches per scene.
+                                  num_thread=30)          ##  num_thread(30) patches per scene.
     print('size of training data:  ', tra_dset.__len__())
 
     ''' ----- 1.3. validation data loading (validation patches) ------ '''
@@ -199,7 +207,9 @@ if __name__ == '__main__':
     ''' -------- 2. Model loading and training strategy ------- '''
     model = model
     optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
-    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,mode='min', factor=0.6, patience=10)
+    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, \
+                                                  mode='min', factor=0.6, patience=20)
+    # lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.6)
 
     ''' -------- 3. Model training for loops ------- '''
     metrics = train_loops(model=model,  
@@ -207,8 +217,9 @@ if __name__ == '__main__':
                         optimizer=optimizer,  
                         tra_loader=tra_loader,  
                         val_loader=val_loader,  
-                        epoches=config.epoch,  
-                        lr_scheduler=lr_scheduler)
+                        epoches=num_epoch,  
+                        lr_scheduler=lr_scheduler,
+                        )
 
     ''' -------- 4. trained model and accuracy metric saving  ------- '''
     # model saving
@@ -221,3 +232,4 @@ if __name__ == '__main__':
     metrics_df.to_csv(path_metrics, index=False, sep=',')
     metrics_df = pd.read_csv(path_metrics)
     print('Training metrics are saved to --> ', path_metrics)
+
