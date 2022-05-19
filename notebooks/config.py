@@ -21,15 +21,18 @@ dir_des = root_proj + '/data/dset/s1_descend_clean'
 dir_truth = root_proj + '/data/dset/s1_truth_clean'
 
 ## -------- train/validation data spliting --------
+# ### for visually asscessment (!!!our previous experiment)
+# val_ids = ['01','02','03','04','05','06','07',] 
+# tra_ids= ['08','09','10','11','12','13','14','15','16','17',
+#           '18','19','20','21','22','23','24','25','26','27',
+#           '28','29','30','31','32','33','34','35','36','37','38','39']
 
-# val_ids = ['03','06','08','11','15','19','24','31','39']
-# tra_ids= ['01','02','04','05','07','09','10','12','13','14','16',
-        #   '17','18','20','21','22','23','25','26','27','28','29',
-        #   '30','32','33','34','35','36','37','38']
-val_ids = ['01','02','03','04','05','06','07']
-tra_ids= ['08','09','10','11','12','13','14','15','16','17','18',
-          '19','20','21','22','23','24','25','26','27','28','29',
-          '30','31','32','33','34','35','36','37','38','39']
+### for epoch-accuracy plots (!!!our latter experiment)
+val_ids = ['03','06','07','11','15','16','18','24','31','39']
+tra_ids= ['01','02','04','05','08','09','10','12','13','14',
+          '17','19','20','21','22','23','25','26','27','28',
+          '29','30','32','33','34','35','36','37','38']
+
 
 
 # --- patch dir for validation ---
@@ -39,19 +42,19 @@ dir_patch_val = root_proj + '/data/dset/s1_val_patches'
 s1_min = [-63.00, -70.37, -59.01, -69.94]  # as-vv, as-vh, des-vv, des-vh
 s1_max = [30.61, 13.71, 29.28, 17.60]      # as-vv, as-vh, des-vv, des-vh
 
-def missing_line_aug(prob=0.3):    # implemented in the parallel_loader.py
+def missing_line_aug(prob=0.25):    # implemented in the parallel_loader.py
     return missing_line(prob=prob)
 
 transforms_tra = [
         ### !!!note: line missing is in the paraller_loader.py
-        colorjitter(prob=0.3, alpha=0.05, beta=0.05),    # numpy-based, !!!beta should be small
+        colorjitter(prob=0.25, alpha=0.05, beta=0.05),    # numpy-based, !!!beta should be small
         # bandjitter(prob=0.2),     # numpy-based 
-        rotate(prob=0.3),           # numpy-based
-        flip(prob=0.3),             # numpy-based
-        missing_region(prob=0.3, ratio_max=0.2),    # numpy-based
-        missing_band_p(prob=0.3, ratio_max=0.2),    # numpy-based
+        rotate(prob=0.25),           # numpy-based
+        flip(prob=0.25),             # numpy-based
+        missing_region(prob=0.25, ratio_max=0.2),    # numpy-based
+        missing_band_p(prob=0.25, ratio_max=0.2),    # numpy-based
         numpy2tensor(), 
-        torch_noise(prob=0.3, std_min=0, std_max=0.1),      # tensor-based
+        torch_noise(prob=0.25, std_min=0, std_max=0.1),      # tensor-based
             ]
 
 ## ---------- model training ------- ##

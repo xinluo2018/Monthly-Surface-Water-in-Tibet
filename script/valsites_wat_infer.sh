@@ -10,7 +10,7 @@
 cd /home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet
 
 # IDS_MODEL='0 1 2 3 4 5 6 7 8 9'
-IDS_MODEL='6'
+IDS_MODEL='4'
 
 for ID_MODEL in $IDS_MODEL
 
@@ -24,7 +24,7 @@ do
   model_scales=model/trained_model/scales/traset/as_des/model_${ID_MODEL}_weights.pth
   model_single=model/trained_model/single/traset/as_des/model_${ID_MODEL}_weights.pth
 
-  VALSITES='03 06 08 11 15 19 24 31 37 39'
+  VALSITES='01 02 03 04 05 06 07 08 09'
 
   for I_VAL in $VALSITES
   do

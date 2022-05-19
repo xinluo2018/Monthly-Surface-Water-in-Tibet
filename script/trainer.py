@@ -93,7 +93,7 @@ def train_loops(model, loss_fn, optimizer, tra_loader, val_loader, epoches, lr_s
             x_batch, y_batch = [batch.to(device) for batch in x_batch], y_batch.to(device)
             if model.name == 'deeplabv3plus':
               x_batch = x_batch[2]      # !!!note: x_batch[2] for single-scale model
-            # y_batch = config.label_smooth(y_batch) 
+            y_batch = config.label_smooth(y_batch) 
             loss, miou, oa = train_step(model=model, loss_fn=loss_fn, 
                                         optimizer=optimizer, x=x_batch, y=y_batch)
             tra_loss += loss.item()
