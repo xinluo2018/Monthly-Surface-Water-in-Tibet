@@ -1,0 +1,18 @@
+## data/dset
+data/dset
+
+## data/tibet
+data/tibet/
+
+## figure
+figure/
+
+## pretained model
+model/trained_model/*
+
+## the other
+.venv
+.vscode
+.DS_Store
+*__pycache__/
+
