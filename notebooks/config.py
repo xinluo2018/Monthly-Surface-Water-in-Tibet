@@ -12,8 +12,12 @@ from dataloader.img_aug import colorjitter, bandjitter
 ## ------------- Path -------------- ##
 # -------- root directory --------  #
 root_tb_data = '/WD-myBook/tibet-water'
+<<<<<<< HEAD
 # root_proj = "/home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet"
 root_proj = '/Users/luo/Downloads/Monthly-Surface-Water-in-Tibet-main'
+=======
+root_proj = "/home/yons/Desktop/developer-luo/Monthly-Surface-Water-in-Tibet"
+>>>>>>> fe255a2eac3a40f7a2ca57ccfc7cd3106b647f4c
 
 # ------------ data directory -------------- #
 # --- scene dir path for training ---
