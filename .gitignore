@@ -1,11 +1,11 @@
 ## data/dset
-data/dset
+# data/dset
 
 ## data/tibet
-data/tibet/
+# data/tibet/
 
 ## figure
-figure/
+# figure/
 
 ## pretained model
 model/trained_model/*
